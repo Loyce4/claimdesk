@@ -24,15 +24,15 @@ services:
     volumes:
       - ./backend:/app
 
-  frontend:
-    build: ./frontend
-    restart: unless-stopped
-    depends_on:
-      - backend
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
+  #frontend:
+    #build: ./frontend
+    #restart: unless-stopped
+    #depends_on:
+    #  - backend
+    #ports:
+    #  - "3000:3000"
+    #volumes:
+    #  - ./frontend:/app
 
 volumes:
   claimdesk_db_data:
