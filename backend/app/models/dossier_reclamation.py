@@ -9,7 +9,7 @@ connexion Odoo.
 import enum
 import uuid
 
-from sqlalchemy import Column, String, Text, Float, Date, DateTime, Enum, JSON
+from sqlalchemy import Column, String, Text, Float, Date, DateTime, Enum, JSON, Integer
 from sqlalchemy.sql import func
 
 from app.database import Base
@@ -53,7 +53,7 @@ class DossierReclamation(Base):
 
     # Renseignés automatiquement par le moteur de règles (rules_engine/)
     base_juridique = Column(String, nullable=True)
-    delai_cible_jours = Column(String, nullable=True)
+    delai_cible_jours = Column(Integer, nullable=True)
     date_echeance = Column(Date, nullable=True)
     organe_escalade = Column(String, nullable=True)
 

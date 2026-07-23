@@ -45,3 +45,23 @@ def test_aucune_regle_pour_pays_non_couvert(regles_test):
     # bloquer le dépôt du dossier côté client.
     regle = moteur.trouver_regle("non_livraison", "PL")
     assert regle is None
+def test_date_echeance_calculee(regles_test):
+    from datetime import date
+    from app.models.dossier_reclamation import DossierReclamation, TypeReclamation, StatutDossier
+
+    dossier = DossierReclamation(
+        numero_dossier="FR-2026-000099",
+        pays="FR",
+        langue="fr",
+        type_reclamation=TypeReclamation.NON_LIVRAISON,
+        description="Test de calcul d'échéance.",
+        nom_client="Client Test",
+        email_client="client@example.com",
+        date_depot=date(2026, 1, 1),
+        statut=StatutDossier.DEPOSE,
+    )
+
+    moteur.appliquer_regle(dossier)
+
+    assert dossier.date_echeance == date(2026, 1, 31)  # 1er janvier + 30 jours
+    assert dossier.base_juridique == "Code de la consommation, art. L216-1"

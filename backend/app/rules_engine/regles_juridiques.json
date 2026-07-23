@@ -2,16 +2,16 @@
   "_lisez_moi": "Fichier rempli par l'équipe Droit international (Félicite). Le moteur de règles lit ce fichier — aucune règle ne doit être codée en dur dans le code Python.",
   "regles": [
     {
-      "type_reclamation": "produit_non_conforme",
+      "type_reclamation": "non_livraison",
       "pays": "FR",
-      "base_juridique": "",
-      "condition_recevabilite": "",
-      "remede_possible": "",
-      "delai_cible_jours": null,
-      "delai_prescription_jours": null,
-      "organe_escalade": "",
-      "source": "",
-      "date_verification": ""
+      "base_juridique": "Code de la consommation, art. L216-1",
+      "condition_recevabilite": "Livraison non effectuée après la date convenue",
+      "remede_possible": "Remboursement intégral",
+      "delai_cible_jours": 30,
+      "delai_prescription_jours": 730,
+      "organe_escalade": "Médiateur de la consommation",
+      "source": "https://www.legifrance.gouv.fr/",
+      "date_verification": "2026-01-01"
     }
   ]
 }

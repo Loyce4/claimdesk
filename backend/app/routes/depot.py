@@ -10,12 +10,12 @@ from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+
 from app.database import get_db
 from app.models.dossier_reclamation import DossierReclamation, StatutDossier
 from app.models.schemas import DepotReclamationIn, DossierReclamationOut
 from app.services.numerotation import generer_numero_dossier
-from app.rules_engine.moteur import trouver_regle
-
+from app.rules_engine.moteur import appliquer_regle
 router = APIRouter()
 
 
@@ -43,14 +43,10 @@ def deposer_reclamation(payload: DepotReclamationIn, db: Session = Depends(get_d
         historique=[{"statut": "depose", "date": date.today().isoformat(), "auteur": "client"}],
     )
 
-    # Applique la règle juridique correspondante si elle existe déjà dans la
-    # matrice de Félicite. Sinon, le dossier reste créé mais sans échéance —
-    # à qualifier manuellement, pour ne jamais bloquer un client au dépôt.
-    regle = trouver_regle(payload.type_reclamation.value, payload.pays.upper())
-    if regle:
-        dossier.base_juridique = regle.get("base_juridique") or None
-        dossier.organe_escalade = regle.get("organe_escalade") or None
-
+   # Applique la règle juridique correspondante si elle existe déjà dans la
+    # matrice de Félicite (base juridique, échéance, organe d'escalade).
+    # Ne bloque jamais le dépôt si la règle n'existe pas encore.
+    appliquer_regle(dossier)
     db.add(dossier)
     db.commit()
     db.refresh(dossier)

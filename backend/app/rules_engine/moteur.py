@@ -8,6 +8,8 @@ base plus tard), fourni et mis à jour par l'équipe Droit international.
 
 import json
 from pathlib import Path
+from datetime import timedelta
+
 
 REGLES_PATH = Path(__file__).parent / "regles_juridiques.json"
 
@@ -30,12 +32,21 @@ def appliquer_regle(dossier) -> None:
     """
     À appeler au dépôt du dossier pour renseigner automatiquement :
     base_juridique, delai_cible_jours, date_echeance, organe_escalade.
+
+    Ne lève pas d'exception si aucune règle n'existe encore pour ce
+    type de réclamation / pays — le dossier reste créé, juste sans
+    échéance, à qualifier manuellement en attendant que la matrice
+    juridique soit complétée par l'équipe Droit international.
     """
     regle = trouver_regle(dossier.type_reclamation, dossier.pays)
     if regle is None:
-        raise ValueError(
-            f"Aucune règle trouvée pour {dossier.type_reclamation} / {dossier.pays} "
-            "— à signaler à l'équipe Droit international."
-        )
-    # TODO: appliquer les valeurs de `regle` au dossier une fois le modèle
-    # de données confirmé (dossier.base_juridique = regle["base_juridique"], etc.)
+        return
+
+    dossier.base_juridique = regle.get("base_juridique") or None
+    dossier.organe_escalade = regle.get("organe_escalade") or None
+
+    delai = regle.get("delai_cible_jours")
+    if delai is not None:
+        dossier.delai_cible_jours = delai
+        dossier.date_echeance = dossier.date_depot + timedelta(days=delai)
+        
