@@ -1,0 +1,17 @@
+{
+  "_lisez_moi": "Fichier rempli par l'équipe Droit international (Félicite). Le moteur de règles lit ce fichier — aucune règle ne doit être codée en dur dans le code Python.",
+  "regles": [
+    {
+      "type_reclamation": "produit_non_conforme",
+      "pays": "FR",
+      "base_juridique": "",
+      "condition_recevabilite": "",
+      "remede_possible": "",
+      "delai_cible_jours": null,
+      "delai_prescription_jours": null,
+      "organe_escalade": "",
+      "source": "",
+      "date_verification": ""
+    }
+  ]
+}
