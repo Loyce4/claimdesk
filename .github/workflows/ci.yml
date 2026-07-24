@@ -30,7 +30,7 @@ jobs:
         run: npm run test:coverage
 
       - name: Analyse SonarCloud
-        uses: SonarSource/sonarqube-scan-action@<sha-complet> # v5.x 
+        uses: SonarSource/sonarqube-scan-action@v5
         with:
           projectBaseDir: backend
         env:
