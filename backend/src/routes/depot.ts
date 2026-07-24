@@ -6,6 +6,7 @@ import { depotReclamationInSchema, dossierReclamationOutSchema } from "../schema
 import { genererNumeroDossier } from "../services/numerotation.js";
 import { appliquerRegle } from "../rulesEngine/moteur.js";
 import { genererCourrier } from "../services/courriers.js";
+import { synchroniserVersOdoo } from "../services/odoo.js";
 import { PAYS_AUTORISES } from "../models/dossierReclamation.js";
 import type { TypeReclamation } from "../models/dossierReclamation.js";
 
@@ -91,6 +92,21 @@ export const depotRoutes: FastifyPluginAsync = async (fastify) => {
 
       // Notifie les clients WebSocket abonnés au suivi de ce dossier
       fastify.publierMiseAJourDossier?.(dossier.numeroDossier, dossier);
+
+      // Synchronise vers Odoo, en tâche de fond (n'attend pas la réponse
+      // Odoo pour répondre au client — l'ERP peut être lent ou temporairement
+      // indisponible sans jamais bloquer le dépôt de la réclamation).
+      synchroniserVersOdoo({
+        numeroDossier: dossier.numeroDossier,
+        pays: dossier.pays,
+        typeReclamation: dossier.typeReclamation,
+        description: dossier.description,
+        nomClient: dossier.nomClient,
+        emailClient: payload.emailClient,
+        montantReclame: payload.montantReclame ?? null,
+        statut: dossier.statut,
+        dateEcheance: dossier.dateEcheance,
+      }).catch((err) => fastify.log.error(err, "Échec de synchronisation Odoo"));
 
       return reply.status(201).send(dossier);
     }
