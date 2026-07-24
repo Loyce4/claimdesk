@@ -1,17 +1,6 @@
-# Python
-__pycache__/
-*.pyc
-*.pyo
-venv/
-.pytest_cache/
-
-# Environnement
-.env
-
-# Node / frontend
 node_modules/
 dist/
-
-# Système
+.env
 .DS_Store
 Thumbs.db
+coverage/

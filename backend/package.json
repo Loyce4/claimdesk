@@ -1,0 +1,30 @@
+{
+  "name": "claimdesk-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "fastify": "^4.28.1",
+    "@fastify/swagger": "^8.15.0",
+    "@fastify/swagger-ui": "^4.0.1",
+    "@fastify/websocket": "^10.0.1",
+    "fastify-type-provider-zod": "^2.0.0",
+    "zod": "^3.23.8",
+    "pg": "^8.12.0",
+    "handlebars": "^4.7.8",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "tsx": "^4.16.5",
+    "vitest": "^2.0.5",
+    "@types/node": "^20.14.15",
+    "@types/pg": "^8.11.6"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "_lisezMoi": "Fichier rempli par l'équipe Droit international (Félicite). Le moteur de règles lit ce fichier — aucune règle ne doit être codée en dur dans le code TypeScript.",
+  "regles": [
+    {
+      "typeReclamation": "non_livraison",
+      "pays": "FR",
+      "baseJuridique": "Code de la consommation, art. L216-1",
+      "conditionRecevabilite": "Livraison non effectuée après la date convenue",
+      "remedePossible": "Remboursement intégral",
+      "delaiCibleJours": 30,
+      "delaiPrescriptionJours": 730,
+      "organeEscalade": "Médiateur de la consommation",
+      "source": "https://www.legifrance.gouv.fr/",
+      "dateVerification": "2026-01-01"
+    }
+  ]
+}
