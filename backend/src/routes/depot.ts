@@ -7,8 +7,8 @@ import { genererNumeroDossier } from "../services/numerotation.js";
 import { appliquerRegle } from "../rulesEngine/moteur.js";
 import { genererCourrier } from "../services/courriers.js";
 import { synchroniserVersOdoo } from "../services/odoo.js";
-import { PAYS_AUTORISES } from "../models/dossierReclamation.js";
-import type { TypeReclamation } from "../models/dossierReclamation.js";
+import { PAYS_CLIENTS, LANGUE_PAR_PAYS } from "../models/dossierReclamation.js";
+import type { PaysClient, TypeReclamation } from "../models/dossierReclamation.js";
 
 function mapRowVersDossierOut(row: any) {
   return {
@@ -18,11 +18,25 @@ function mapRowVersDossierOut(row: any) {
     typeReclamation: row.type_reclamation,
     description: row.description,
     nomClient: row.nom_client,
+    emailClient: row.email_client,
+    montantReclame: row.montant_reclame !== null ? Number(row.montant_reclame) : null,
     statut: row.statut,
-    dateDepot: row.date_depot.toISOString().slice(0, 10),
-    dateEcheance: row.date_echeance ? row.date_echeance.toISOString().slice(0, 10) : null,
+    dateDepot: row.date_depot instanceof Date
+    ? row.date_depot.toLocaleDateString("fr-CA")
+    : row.date_depot,
+    // Qualification juridique (US-B4 : visible pour ajustement)
+    baseJuridique: row.base_juridique ?? null,
+    delaiCibleJours: row.delai_cible_jours ?? null,
+    dateEcheance: row.date_echeance
+    ? (row.date_echeance instanceof Date
+    ? row.date_echeance.toLocaleDateString("fr-CA")
+    : row.date_echeance)
+    : null,
+    organeEscalade: row.organe_escalade ?? null,
+
     createdAt: row.created_at.toISOString(),
   };
+
 }
 
 export const depotRoutes: FastifyPluginAsync = async (fastify) => {
@@ -45,11 +59,14 @@ export const depotRoutes: FastifyPluginAsync = async (fastify) => {
       const payload = request.body;
       const paysMaj = payload.pays.toUpperCase();
 
-      if (!(PAYS_AUTORISES as readonly string[]).includes(paysMaj)) {
+      if (!(PAYS_CLIENTS as readonly string[]).includes(paysMaj)) {
         return reply.status(400).send({
           message: `Pays '${payload.pays}' hors périmètre (FR, DE, ES, IT, BE, NL, PL).`,
         });
       }
+      // Langue déduite du pays (US-C2) — le client peut la surcharger
+const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysClient];
+
 
       const numeroDossier = await genererNumeroDossier(pool, paysMaj);
       const dateDepot = new Date();
@@ -62,28 +79,30 @@ export const depotRoutes: FastifyPluginAsync = async (fastify) => {
 
       const insertResult = await pool.query(
         `INSERT INTO dossiers_reclamation
-          (numero_dossier, pays, langue, type_reclamation, description,
-           nom_client, email_client, montant_reclame, date_depot, statut,
-           base_juridique, delai_cible_jours, date_echeance, organe_escalade,
-           historique)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,'depose',$10,$11,$12,$13,$14::jsonb)
-         RETURNING *`,
+  (numero_dossier, pays, langue, type_reclamation, description,
+   nom_client, email_client, montant_reclame, reference_commande, date_achat,
+   date_depot, statut, base_juridique, delai_cible_jours, date_echeance,
+   organe_escalade, historique)
+ VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'recu',$12,$13,$14,$15,$16::jsonb)
+ RETURNING *`,
         [
           numeroDossier,
           paysMaj,
-          payload.langue.toLowerCase(),
+          langue,
           payload.typeReclamation,
           payload.description,
           payload.nomClient,
           payload.emailClient,
           payload.montantReclame ?? null,
+          payload.referenceCommande,
+          payload.dateAchat,
           dateDepot,
           resultatRegle.baseJuridique,
           resultatRegle.delaiCibleJours,
           resultatRegle.dateEcheance,
           resultatRegle.organeEscalade,
           JSON.stringify([
-            { statut: "depose", date: dateDepot.toISOString(), auteur: "client" },
+            { statut: "recu", date: dateDepot.toISOString(), auteur: "client" },
           ]),
         ]
       );

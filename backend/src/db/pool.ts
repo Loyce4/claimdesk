@@ -25,8 +25,10 @@ CREATE TABLE IF NOT EXISTS dossiers_reclamation (
   nom_client TEXT NOT NULL,
   email_client TEXT NOT NULL,
   montant_reclame NUMERIC,
+  reference_commande TEXT NOT NULL,
+  date_achat DATE NOT NULL,
   date_depot DATE NOT NULL DEFAULT CURRENT_DATE,
-  statut TEXT NOT NULL DEFAULT 'depose',
+  statut TEXT NOT NULL DEFAULT 'recu',
   base_juridique TEXT,
   delai_cible_jours INTEGER,
   date_echeance DATE,
@@ -38,8 +40,27 @@ CREATE TABLE IF NOT EXISTS dossiers_reclamation (
 );
 `;
 
+/**
+ * Migrations idempotentes pour les bases créées avec une version
+ * antérieure du schéma. Chaque instruction est sans effet si la base
+ * est déjà à jour (IF NOT EXISTS / WHERE ciblé).
+ */
+const MIGRATE_SQL = `
+ALTER TABLE dossiers_reclamation
+  ADD COLUMN IF NOT EXISTS reference_commande TEXT,
+  ADD COLUMN IF NOT EXISTS date_achat DATE;
+
+ALTER TABLE dossiers_reclamation
+  ALTER COLUMN statut SET DEFAULT 'recu';
+
+UPDATE dossiers_reclamation SET statut = 'recu' WHERE statut = 'depose';
+UPDATE dossiers_reclamation SET statut = 'en_traitement' WHERE statut = 'en_cours';
+UPDATE dossiers_reclamation SET statut = 'proposition' WHERE statut = 'proposition_envoyee';
+`;
+
 export async function initDatabase(): Promise<void> {
   // Nécessaire pour gen_random_uuid() sur certaines images Postgres
   await pool.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
   await pool.query(CREATE_TABLE_SQL);
+  await pool.query(MIGRATE_SQL);
 }

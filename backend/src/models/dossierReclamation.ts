@@ -86,4 +86,16 @@ export interface DossierReclamation {
   // Traçabilité (US-D4)
   createdAt: string;
   updatedAt: string;
+
 }
+
+ // Langue par défaut déduite du pays du client (US-C2)
+export const LANGUE_PAR_PAYS: Record<PaysClient, string> = {
+  FR: "fr",
+  DE: "de",
+  ES: "es",
+  IT: "it",
+  BE: "fr", // ⚠️ à valider en équipe : fr ou nl ?
+  NL: "nl",
+  PL: "pl",
+};
