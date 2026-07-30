@@ -37,8 +37,11 @@ export function trouverRegle(
   typeReclamation: string,
   pays: string
 ): RegleJuridique | undefined {
-  return chargerRegles().find(
-    (r) => r.typeReclamation === typeReclamation && r.pays === pays
+  const regles = chargerRegles();
+  // Règle spécifique au pays en priorité, sinon règle générale "*"
+  return (
+    regles.find((r) => r.typeReclamation === typeReclamation && r.pays === pays) ??
+    regles.find((r) => r.typeReclamation === typeReclamation && r.pays === "*")
   );
 }
 

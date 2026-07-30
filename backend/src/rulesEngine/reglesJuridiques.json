@@ -1,17 +1,67 @@
 {
-  "_lisezMoi": "Fichier rempli par l'équipe Droit international (Félicite). Le moteur de règles lit ce fichier — aucune règle ne doit être codée en dur dans le code TypeScript.",
+  "_lisezMoi": "Fichier rempli par l'équipe Droit international (Félicité). Le moteur de règles lit ce fichier — aucune règle ne doit être codée en dur dans le code TypeScript. Le pays '*' signifie : applicable à tous les pays du périmètre. Une règle avec un pays précis (ex. 'IT') prend le dessus sur la règle '*'.",
+  "source": "Matrice de qualification juridique — Félicité, équipe Droit international",
+  "dateVerification": "2026-07-25",
+  "decisions": "Fourchettes de délais : maximum retenu. Prescription : garantie légale de conformité. NL : plancher 24 mois + examen manuel. IT : 26 mois. (Validé Félicité 25/07)",
+  "prescriptionMoisParPays": {
+    "FR": 24,
+    "DE": 24,
+    "ES": 36,
+    "IT": 26,
+    "BE": 24,
+    "NL": 24,
+    "PL": 24
+  },
   "regles": [
     {
+      "typeReclamation": "produit_non_conforme",
+      "pays": "*",
+      "baseJuridique": "Directive (UE) 2019/771 & codes nationaux",
+      "conditionRecevabilite": "Défaut de conformité invoqué dans le délai de garantie légale du pays",
+      "remedePossible": "Mise en conformité gratuite (réparation/remplacement), à défaut réduction de prix ou remboursement",
+      "delaiCibleJours": 14,
+      "organeEscalade": "Service juridique / Responsabilité produit",
+      "dateVerification": "2026-07-25"
+    },
+    {
       "typeReclamation": "non_livraison",
-      "pays": "FR",
-      "baseJuridique": "Code de la consommation, art. L216-1",
+      "pays": "*",
+      "baseJuridique": "Directive 2011/83/UE (droits des consommateurs)",
       "conditionRecevabilite": "Livraison non effectuée après la date convenue",
-      "remedePossible": "Remboursement intégral",
+      "remedePossible": "Nouvelle expédition sous délai raisonnable ou remboursement intégral sous 14 jours",
+      "delaiCibleJours": 14,
+      "organeEscalade": "Service logistique / Transporteur",
+      "dateVerification": "2026-07-25"
+    },
+    {
+      "typeReclamation": "retractation",
+      "pays": "*",
+      "baseJuridique": "Directive 2011/83/UE (art. 9 à 16)",
+      "conditionRecevabilite": "Notification dans les 14 jours suivant la réception du bien",
+      "remedePossible": "Remboursement intégral (frais de livraison standard inclus) sous 14 jours",
+      "delaiCibleJours": 14,
+      "organeEscalade": "Service retours / Comptabilité client",
+      "dateVerification": "2026-07-25"
+    },
+    {
+      "typeReclamation": "contenu_numerique_defectueux",
+      "pays": "*",
+      "baseJuridique": "Directive (UE) 2019/770",
+      "conditionRecevabilite": "Défaut de conformité du contenu ou service numérique fourni",
+      "remedePossible": "Correctif / mise en conformité sans frais, à défaut remboursement ou avoir",
+      "delaiCibleJours": 14,
+      "organeEscalade": "Support technique / Équipe produit IT",
+      "dateVerification": "2026-07-25"
+    },
+    {
+      "typeReclamation": "litige_facturation",
+      "pays": "*",
+      "baseJuridique": "Directive 2011/83/UE & code du commerce / droit des obligations",
+      "conditionRecevabilite": "Contestation d'un montant facturé ou d'un prélèvement",
+      "remedePossible": "Émission d'un avoir, correction de facture ou remboursement du trop-perçu",
       "delaiCibleJours": 30,
-      "delaiPrescriptionJours": 730,
-      "organeEscalade": "Médiateur de la consommation",
-      "source": "https://www.legifrance.gouv.fr/",
-      "dateVerification": "2026-01-01"
+      "organeEscalade": "Service facturation / Comptabilité",
+      "dateVerification": "2026-07-25"
     }
   ]
 }
