@@ -35,6 +35,9 @@ CREATE TABLE IF NOT EXISTS dossiers_reclamation (
   organe_escalade TEXT,
   recevable BOOLEAN,
   motif_irrecevabilite TEXT,
+  montant_indemnite_eur NUMERIC,
+  delai_traitement_jours INTEGER,
+  regle_le TIMESTAMPTZ,
   historique JSONB DEFAULT '[]',
   pieces_jointes JSONB DEFAULT '[]',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -72,6 +75,10 @@ UPDATE dossiers_reclamation SET statut = 'proposition' WHERE statut = 'propositi
 ALTER TABLE dossiers_reclamation
   ADD COLUMN IF NOT EXISTS recevable BOOLEAN,
   ADD COLUMN IF NOT EXISTS motif_irrecevabilite TEXT;
+ALTER TABLE dossiers_reclamation
+  ADD COLUMN IF NOT EXISTS montant_indemnite_eur NUMERIC,
+  ADD COLUMN IF NOT EXISTS delai_traitement_jours INTEGER,
+  ADD COLUMN IF NOT EXISTS regle_le TIMESTAMPTZ;
 `;
 
 export async function initDatabase(): Promise<void> {

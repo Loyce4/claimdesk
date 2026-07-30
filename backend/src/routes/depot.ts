@@ -11,6 +11,7 @@ import type { PaysClient, TypeReclamation } from "../models/dossierReclamation.j
 import { appliquerRegle, evaluerRecevabilite } from "../rulesEngine/moteur.js";
 import { envoyerCourrier, listerEnvois } from "../services/envoiCourrier.js";
 import { escaladerDossiersEnRetard } from "../services/escalade.js";
+import { validerReglement } from "../services/reglement.js";
 function mapRowVersDossierOut(row: any) {
   return {
     numeroDossier: row.numero_dossier,
@@ -273,6 +274,58 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
     async (_request, reply) => {
       return reply.send({ escalades: await escaladerDossiersEnRetard() });
     }
-  ); 
+  );
+
+  app.post(
+    "/reclamations/:numeroDossier/reglement",
+    {
+      schema: {
+        tags: ["règlement"],
+        summary: "Valider un remboursement ou une indemnité (US-E1)",
+        params: z.object({ numeroDossier: z.string() }),
+        body: z.object({
+          montantIndemniteEur: z.number().min(0),
+          auteur: z.string().min(1).default("juriste"),
+        }),
+      },
+    },
+    async (request, reply) => {
+      const { numeroDossier } = request.params;
+      const { montantIndemniteEur, auteur } = request.body;
+
+      const resultat = await validerReglement({ numeroDossier, montantIndemniteEur, auteur });
+
+      if (!resultat.ok || !resultat.dossier) {
+        return reply.status(400).send({ message: resultat.erreur ?? "Règlement impossible." });
+      }
+
+      const dossier = resultat.dossier;
+
+      // Notification du règlement au client (US-E2)
+      const texte = genererCourrier(
+        {
+          numeroDossier: dossier.numeroDossier,
+          nomClient: dossier.nomClient,
+          dateDepot: "",
+          montantReclame: dossier.montantIndemniteEur,
+          delaiCibleJours: dossier.delaiTraitementJours,
+        },
+        dossier.langue,
+        "notificationReglement"
+      );
+
+      await envoyerCourrier({
+        numeroDossier: dossier.numeroDossier,
+        typeCourrier: "notificationReglement",
+        destinataire: dossier.emailClient,
+        langue: dossier.langue,
+        contenu: texte,
+      });
+
+      fastify.publierMiseAJourDossier?.(dossier.numeroDossier, dossier);
+
+      return reply.send(dossier);
+    }
+  );
 };
 
