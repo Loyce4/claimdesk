@@ -41,7 +41,18 @@ CREATE TABLE IF NOT EXISTS dossiers_reclamation (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 `;
-
+const CREATE_ENVOIS_SQL = `
+CREATE TABLE IF NOT EXISTS envois_courriers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  numero_dossier TEXT NOT NULL REFERENCES dossiers_reclamation(numero_dossier),
+  type_courrier TEXT NOT NULL,
+  destinataire TEXT NOT NULL,
+  langue TEXT NOT NULL,
+  contenu TEXT NOT NULL,
+  statut_envoi TEXT NOT NULL DEFAULT 'envoye',
+  envoye_le TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+`;
 /**
  * Migrations idempotentes pour les bases créées avec une version
  * antérieure du schéma. Chaque instruction est sans effet si la base
@@ -67,5 +78,6 @@ export async function initDatabase(): Promise<void> {
   // Nécessaire pour gen_random_uuid() sur certaines images Postgres
   await pool.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
   await pool.query(CREATE_TABLE_SQL);
+  await pool.query(CREATE_ENVOIS_SQL);
   await pool.query(MIGRATE_SQL);
 }

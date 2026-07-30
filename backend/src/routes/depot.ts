@@ -9,6 +9,7 @@ import { synchroniserVersOdoo } from "../services/odoo.js";
 import { PAYS_CLIENTS, LANGUE_PAR_PAYS } from "../models/dossierReclamation.js";
 import type { PaysClient, TypeReclamation } from "../models/dossierReclamation.js";
 import { appliquerRegle, evaluerRecevabilite } from "../rulesEngine/moteur.js";
+import { envoyerCourrier, listerEnvois } from "../services/envoiCourrier.js";
 function mapRowVersDossierOut(row: any) {
   return {
     numeroDossier: row.numero_dossier,
@@ -116,7 +117,37 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
       );
 
       const dossier = mapRowVersDossierOut(insertResult.rows[0]);
-      
+      // Accusé de réception envoyé automatiquement au dépôt (US-A3, US-C3).
+      // En tâche de fond : un échec d'envoi ne doit jamais bloquer le dépôt.
+      (async () => {
+        const row = insertResult.rows[0];
+        const texte = genererCourrier(
+          {
+            numeroDossier: dossier.numeroDossier,
+            nomClient: dossier.nomClient,
+            dateDepot: dossier.dateDepot,
+            typeReclamation: dossier.typeReclamation,
+            baseJuridique: dossier.baseJuridique,
+            delaiCibleJours: dossier.delaiCibleJours,
+            dateEcheance: dossier.dateEcheance,
+            recevable: row.recevable ?? null,
+            motifIrrecevabilite: row.motif_irrecevabilite ?? null,
+            montantReclame: dossier.montantReclame,
+          },
+          dossier.langue,
+          "accuseReception"
+        );
+
+        await envoyerCourrier({
+          numeroDossier: dossier.numeroDossier,
+          typeCourrier: "accuseReception",
+          destinataire: payload.emailClient,
+          langue: dossier.langue,
+          contenu: texte,
+        });
+      })().catch((err) =>
+        fastify.log.error(err, "Échec de l'envoi de l'accusé de réception")
+      );
 
       // Notifie les clients WebSocket abonnés au suivi de ce dossier
       fastify.publierMiseAJourDossier?.(dossier.numeroDossier, dossier);
@@ -212,6 +243,21 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
         nomCourrier
       );
       return reply.type("text/plain; charset=utf-8").send(texte);
+    }
+  );
+
+  app.get(
+    "/reclamations/:numeroDossier/envois",
+    {
+      schema: {
+        tags: ["courriers"],
+        summary: "Historique des courriers envoyés",
+        params: z.object({ numeroDossier: z.string() }),
+      },
+    },
+    async (request, reply) => {
+      const { numeroDossier } = request.params;
+      return reply.send(await listerEnvois(numeroDossier));
     }
   );
 };
