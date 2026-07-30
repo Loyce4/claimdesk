@@ -9,6 +9,7 @@
 
 import type { FastifyInstance, FastifyPluginAsync } from "fastify";
 import type { WebSocket } from "ws";
+import fp from "fastify-plugin";
 
 declare module "fastify" {
   interface FastifyInstance {
@@ -16,7 +17,7 @@ declare module "fastify" {
   }
 }
 
-export const websocketSuiviRoutes: FastifyPluginAsync = async (fastify: FastifyInstance) => {
+const suiviPlugin: FastifyPluginAsync = async (fastify: FastifyInstance) => {
   // Abonnés par numéro de dossier : plusieurs onglets/clients peuvent
   // suivre le même dossier en même temps.
   const abonnes = new Map<string, Set<WebSocket>>();
@@ -24,20 +25,18 @@ export const websocketSuiviRoutes: FastifyPluginAsync = async (fastify: FastifyI
   fastify.get(
     "/ws/reclamations/:numeroDossier",
     { websocket: true },
-    (connection, request) => {
+    (socket: WebSocket, request) => {
       const { numeroDossier } = request.params as { numeroDossier: string };
 
       if (!abonnes.has(numeroDossier)) {
         abonnes.set(numeroDossier, new Set());
       }
-      abonnes.get(numeroDossier)!.add(connection.socket);
+      abonnes.get(numeroDossier)!.add(socket);
 
-      connection.socket.send(
-        JSON.stringify({ type: "connecte", numeroDossier })
-      );
+      socket.send(JSON.stringify({ type: "connecte", numeroDossier }));
 
-      connection.socket.on("close", () => {
-        abonnes.get(numeroDossier)?.delete(connection.socket);
+      socket.on("close", () => {
+        abonnes.get(numeroDossier)?.delete(socket);
       });
     }
   );
@@ -59,3 +58,6 @@ export const websocketSuiviRoutes: FastifyPluginAsync = async (fastify: FastifyI
     }
   );
 };
+
+
+export const websocketSuiviRoutes = fp(suiviPlugin);
