@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>ClaimDesk — Suivi de dossier</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 3rem auto; padding: 0 1rem; color: #1a1a1a; }
+    h1 { font-size: 1.4rem; font-weight: 500; }
+    .barre { display: flex; gap: .5rem; margin-bottom: 1.5rem; }
+    input, button { padding: .6rem .8rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 6px; }
+    button { background: #1a1a1a; color: white; border: none; cursor: pointer; }
+    .statut { font-size: 2rem; font-weight: 500; padding: 1.5rem; border: 1px solid #e0e0e0; border-radius: 8px; text-align: center; transition: background .4s; }
+    .flash { background: #fff6d9; }
+    .meta { color: #666; font-size: .9rem; margin-top: .5rem; }
+    ul { list-style: none; padding: 0; font-family: ui-monospace, monospace; font-size: .85rem; }
+    li { padding: .4rem 0; border-bottom: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <h1>Suivi de dossier en temps réel</h1>
+
+  <div class="barre">
+    <input id="numero" value="DE-2026-000004" style="flex:1">
+    <button id="connecter">Suivre</button>
+  </div>
+
+  <div class="statut" id="statut">—</div>
+  <p class="meta" id="meta">Non connecté</p>
+
+  <h2 style="font-size:1rem;font-weight:500;margin-top:2rem">Événements reçus</h2>
+  <ul id="journal"></ul>
+
+  <script>
+    let ws = null;
+
+    function journaliser(texte) {
+      const li = document.createElement("li");
+      li.textContent = new Date().toLocaleTimeString() + " — " + texte;
+      document.getElementById("journal").prepend(li);
+    }
+
+    function afficherStatut(statut) {
+      const el = document.getElementById("statut");
+      el.textContent = statut;
+      el.classList.add("flash");
+      setTimeout(() => el.classList.remove("flash"), 800);
+    }
+
+    document.getElementById("connecter").addEventListener("click", () => {
+      const numero = document.getElementById("numero").value.trim();
+      if (ws) ws.close();
+
+      ws = new WebSocket("ws://localhost:8000/ws/reclamations/" + numero);
+
+      ws.onopen = () => {
+        document.getElementById("meta").textContent = "Connecté au dossier " + numero;
+      };
+
+      ws.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        if (message.type === "connecte") {
+          journaliser("Abonnement confirmé");
+        } else if (message.type === "misAJour") {
+          const donnees = message.donnees ?? {};
+          if (donnees.statut) afficherStatut(donnees.statut);
+          journaliser("Mise à jour : " + JSON.stringify(donnees));
+        }
+      };
+
+      ws.onclose = () => {
+        document.getElementById("meta").textContent = "Déconnecté";
+      };
+
+      ws.onerror = () => journaliser("Erreur de connexion");
+    });
+  </script>
+</body>
+</html>
