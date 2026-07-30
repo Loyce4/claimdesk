@@ -34,11 +34,15 @@ export const dossierReclamationOutSchema = z.object({
   statut: z.enum(STATUTS_DOSSIER),
   dateDepot: z.string(),
 
-  // Qualification juridique (US-B4 : visible pour ajustement)
+  // Qualification juridique (US-B1, US-B3, US-B4 : visible pour ajustement)
   baseJuridique: z.string().nullable(),
   delaiCibleJours: z.number().nullable(),
   dateEcheance: z.string().nullable(),
   organeEscalade: z.string().nullable(),
+
+  // Recevabilité (US-B2)
+  recevable: z.boolean().nullable(),
+  motifIrrecevabilite: z.string().nullable(),
 
   createdAt: z.string(),
 });

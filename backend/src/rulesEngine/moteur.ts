@@ -44,7 +44,45 @@ export function trouverRegle(
     regles.find((r) => r.typeReclamation === typeReclamation && r.pays === "*")
   );
 }
+/** Prescriptions par pays, lues depuis le JSON juridique (garantie légale de conformité). */
+function chargerPrescriptions(): Record<string, number> {
+  const contenu = readFileSync(REGLES_PATH, "utf-8");
+  const data = JSON.parse(contenu);
+  return (data.prescriptionMoisParPays ?? {}) as Record<string, number>;
+}
 
+/**
+ * Évalue la recevabilité d'une réclamation au regard du délai de prescription
+ * du pays (US-B2). Retourne `null` si aucune prescription n'est définie pour
+ * ce pays : le dossier reste alors à qualifier manuellement.
+ */
+export function evaluerRecevabilite(params: {
+  pays: string;
+  dateAchat: Date;
+  dateDepot: Date;
+}): { recevable: boolean | null; motifIrrecevabilite: string | null; prescriptionMois: number | null } {
+  const prescriptionMois = chargerPrescriptions()[params.pays];
+
+  if (prescriptionMois === undefined) {
+    return { recevable: null, motifIrrecevabilite: null, prescriptionMois: null };
+  }
+
+  const dateLimite = new Date(params.dateAchat);
+  dateLimite.setMonth(dateLimite.getMonth() + prescriptionMois);
+
+  if (params.dateDepot > dateLimite) {
+    const limiteTexte = dateLimite.toLocaleDateString("fr-CA");
+    return {
+      recevable: false,
+      motifIrrecevabilite:
+        `Réclamation hors délai : la garantie légale de ${prescriptionMois} mois applicable ` +
+        `en ${params.pays} a expiré le ${limiteTexte}.`,
+      prescriptionMois,
+    };
+  }
+
+  return { recevable: true, motifIrrecevabilite: null, prescriptionMois };
+}
 /**
  * À appeler au dépôt du dossier pour renseigner automatiquement :
  * baseJuridique, delaiCibleJours, dateEcheance, organeEscalade.

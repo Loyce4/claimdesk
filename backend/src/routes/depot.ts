@@ -4,12 +4,11 @@ import { z } from "zod";
 import { pool } from "../db/pool.js";
 import { depotReclamationInSchema, dossierReclamationOutSchema } from "../schemas/reclamation.js";
 import { genererNumeroDossier } from "../services/numerotation.js";
-import { appliquerRegle } from "../rulesEngine/moteur.js";
 import { genererCourrier } from "../services/courriers.js";
 import { synchroniserVersOdoo } from "../services/odoo.js";
 import { PAYS_CLIENTS, LANGUE_PAR_PAYS } from "../models/dossierReclamation.js";
 import type { PaysClient, TypeReclamation } from "../models/dossierReclamation.js";
-
+import { appliquerRegle, evaluerRecevabilite } from "../rulesEngine/moteur.js";
 function mapRowVersDossierOut(row: any) {
   return {
     numeroDossier: row.numero_dossier,
@@ -33,6 +32,8 @@ function mapRowVersDossierOut(row: any) {
     : row.date_echeance)
     : null,
     organeEscalade: row.organe_escalade ?? null,
+    recevable: row.recevable ?? null,
+    motifIrrecevabilite: row.motif_irrecevabilite ?? null,
 
     createdAt: row.created_at.toISOString(),
   };
@@ -76,15 +77,20 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
         pays: paysMaj,
         dateDepot,
       });
+      const recevabilite = evaluerRecevabilite({
+  pays: paysMaj,
+  dateAchat: new Date(payload.dateAchat),
+  dateDepot,
+});
 
       const insertResult = await pool.query(
         `INSERT INTO dossiers_reclamation
-  (numero_dossier, pays, langue, type_reclamation, description,
-   nom_client, email_client, montant_reclame, reference_commande, date_achat,
-   date_depot, statut, base_juridique, delai_cible_jours, date_echeance,
-   organe_escalade, historique)
- VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'recu',$12,$13,$14,$15,$16::jsonb)
- RETURNING *`,
+          (numero_dossier, pays, langue, type_reclamation, description,
+           nom_client, email_client, montant_reclame, reference_commande, date_achat,
+           date_depot, statut, base_juridique, delai_cible_jours, date_echeance,
+           organe_escalade, recevable, motif_irrecevabilite, historique)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'recu',$12,$13,$14,$15,$16,$17,$18::jsonb)
+         RETURNING *`,
         [
           numeroDossier,
           paysMaj,
@@ -101,6 +107,8 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
           resultatRegle.delaiCibleJours,
           resultatRegle.dateEcheance,
           resultatRegle.organeEscalade,
+          recevabilite.recevable,
+          recevabilite.motifIrrecevabilite,
           JSON.stringify([
             { statut: "recu", date: dateDepot.toISOString(), auteur: "client" },
           ]),
@@ -108,6 +116,7 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
       );
 
       const dossier = mapRowVersDossierOut(insertResult.rows[0]);
+      
 
       // Notifie les clients WebSocket abonnés au suivi de ce dossier
       fastify.publierMiseAJourDossier?.(dossier.numeroDossier, dossier);
