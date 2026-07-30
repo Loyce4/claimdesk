@@ -38,16 +38,15 @@ export type StatutDossier = (typeof STATUTS_DOSSIER)[number];
 
 // Transitions autorisées de la machine à états (US-D2, US-D3, US-E1)
 export const TRANSITIONS: Record<StatutDossier, StatutDossier[]> = {
-  recu:              ["qualifie", "en_attente_pieces"],
-  en_attente_pieces: ["qualifie"],
-  qualifie:          ["en_traitement", "cloture"], // clôture directe si irrecevable
+  recu:              ["qualifie", "en_attente_pieces", "escalade"],
+  en_attente_pieces: ["qualifie", "escalade"],
+  qualifie:          ["en_traitement", "cloture", "escalade"],
   en_traitement:     ["proposition", "escalade"],
   proposition:       ["resolu", "escalade"],
   escalade:          ["proposition", "resolu", "cloture"],
   resolu:            ["cloture"],
   cloture:           [],
 };
-
 export interface DossierReclamation {
   // Identité
   id: string;

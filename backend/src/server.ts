@@ -12,6 +12,7 @@ import {
 import { initDatabase } from "./db/pool.js";
 import { depotRoutes } from "./routes/depot.js";
 import { websocketSuiviRoutes } from "./websocket/suivi.js";
+import { demarrerPlanificateur } from "./services/planificateur.js";
 
 async function main() {
   const fastify = Fastify({ logger: true });
@@ -40,6 +41,8 @@ async function main() {
   await fastify.register(depotRoutes);
 
   await initDatabase();
+
+  demarrerPlanificateur(fastify);
 
   const port = Number(process.env.BACKEND_PORT ?? 8000);
   await fastify.listen({ host: "0.0.0.0", port });

@@ -10,6 +10,7 @@ import { PAYS_CLIENTS, LANGUE_PAR_PAYS } from "../models/dossierReclamation.js";
 import type { PaysClient, TypeReclamation } from "../models/dossierReclamation.js";
 import { appliquerRegle, evaluerRecevabilite } from "../rulesEngine/moteur.js";
 import { envoyerCourrier, listerEnvois } from "../services/envoiCourrier.js";
+import { escaladerDossiersEnRetard } from "../services/escalade.js";
 function mapRowVersDossierOut(row: any) {
   return {
     numeroDossier: row.numero_dossier,
@@ -260,4 +261,18 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
       return reply.send(await listerEnvois(numeroDossier));
     }
   );
+
+ app.post(
+    "/administration/controler-delais",
+    {
+      schema: {
+        tags: ["administration"],
+        summary: "Déclencher manuellement le contrôle des dépassements (US-D3)",
+      },
+    },
+    async (_request, reply) => {
+      return reply.send({ escalades: await escaladerDossiersEnRetard() });
+    }
+  ); 
 };
+
