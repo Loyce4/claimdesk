@@ -195,13 +195,23 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
         {
           numeroDossier: row.numero_dossier,
           nomClient: row.nom_client,
-          dateDepot: row.date_depot.toISOString().slice(0, 10),
+          dateDepot: row.date_depot instanceof Date
+            ? row.date_depot.toLocaleDateString("fr-CA")
+            : row.date_depot,
+          typeReclamation: row.type_reclamation,
+          baseJuridique: row.base_juridique ?? null,
+          delaiCibleJours: row.delai_cible_jours ?? null,
+          dateEcheance: row.date_echeance instanceof Date
+            ? row.date_echeance.toLocaleDateString("fr-CA")
+            : (row.date_echeance ?? null),
+          recevable: row.recevable ?? null,
+          motifIrrecevabilite: row.motif_irrecevabilite ?? null,
+          montantReclame: row.montant_reclame !== null ? Number(row.montant_reclame) : null,
         },
         row.langue,
         nomCourrier
       );
-
-      return reply.type("text/plain").send(texte);
+      return reply.type("text/plain; charset=utf-8").send(texte);
     }
   );
 };

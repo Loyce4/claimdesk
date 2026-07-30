@@ -1,0 +1,27 @@
+{{! Empfangsbestätigung — US-A3. Inhalt zu prüfen: Recht (Félicité) und Marketing (Pharelle). }}
+Betreff: Empfangsbestätigung Ihrer Reklamation {{numeroDossier}}
+
+Guten Tag {{nomClient}},
+
+wir bestätigen den Eingang Ihrer Reklamation vom {{dateDepot}}.
+
+Ihr Vorgang trägt die Referenznummer {{numeroDossier}}. Bitte bewahren Sie diese auf: Damit können Sie den Bearbeitungsstand jederzeit verfolgen.
+
+{{#if recevable}}
+Ihre Anfrage wird von unserer Rechtsabteilung bearbeitet.
+{{#if delaiCibleJours}}
+Wir werden Ihnen innerhalb von {{delaiCibleJours}} Tagen antworten{{#if dateEcheance}}, spätestens am {{dateEcheance}}{{/if}}.
+{{/if}}
+{{#if baseJuridique}}
+Anwendbare Rechtsgrundlage: {{baseJuridique}}.
+{{/if}}
+{{else if motifIrrecevabilite}}
+Nach vorläufiger Prüfung kann Ihre Anfrage aus folgendem Grund nicht bearbeitet werden:
+{{motifIrrecevabilite}}
+
+Sollten Sie diese Einschätzung für unzutreffend halten, können Sie uns unter Angabe Ihrer Referenznummer ergänzende Unterlagen zusenden.
+{{/if}}
+
+Mit freundlichen Grüßen
+Kundenservice Reklamationen
+OMNIVIA

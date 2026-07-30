@@ -1,11 +1,27 @@
-{{! Modèle rempli par Félicite (Droit international) — variables injectées automatiquement }}
+{{! Accusé de réception — US-A3. Contenu à valider par Droit international (Félicité) et Marketing (Pharelle). }}
 Objet : Accusé de réception de votre réclamation {{numeroDossier}}
 
 Bonjour {{nomClient}},
 
 Nous vous confirmons la bonne réception de votre réclamation déposée le {{dateDepot}}.
 
-[Texte à compléter par l'équipe Droit international]
+Votre dossier porte la référence {{numeroDossier}}. Conservez-la : elle vous permet de suivre l'avancement de votre demande à tout moment.
+
+{{#if recevable}}
+Votre demande est prise en charge par notre service juridique.
+{{#if delaiCibleJours}}
+Nous nous engageons à vous apporter une réponse sous {{delaiCibleJours}} jours{{#if dateEcheance}}, soit au plus tard le {{dateEcheance}}{{/if}}.
+{{/if}}
+{{#if baseJuridique}}
+Cadre juridique applicable à votre demande : {{baseJuridique}}.
+{{/if}}
+{{else}}
+Après examen préalable, votre demande ne peut être prise en charge pour le motif suivant :
+{{motifIrrecevabilite}}
+
+Si vous estimez que cette analyse est erronée, vous pouvez nous transmettre tout élément complémentaire en rappelant la référence de votre dossier.
+{{/if}}
 
 Cordialement,
-SecuriTrade
+Le service réclamations
+OMNIVIA

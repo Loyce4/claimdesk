@@ -19,6 +19,15 @@ export interface DonneesCourrier {
   numeroDossier: string;
   nomClient: string;
   dateDepot: string;
+  // Qualification (Épopée B) — utile aux courriers de réponse
+  typeReclamation?: string;
+  baseJuridique?: string | null;
+  remedePropose?: string | null;
+  delaiCibleJours?: number | null;
+  dateEcheance?: string | null;
+  recevable?: boolean | null;
+  motifIrrecevabilite?: string | null;
+  montantReclame?: number | null;
 }
 
 export function genererCourrier(
