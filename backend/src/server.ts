@@ -13,7 +13,7 @@ import { initDatabase } from "./db/pool.js";
 import { depotRoutes } from "./routes/depot.js";
 import { websocketSuiviRoutes } from "./websocket/suivi.js";
 import { demarrerPlanificateur } from "./services/planificateur.js";
-
+import multipart from "@fastify/multipart";
 async function main() {
   const fastify = Fastify({ logger: true });
 
@@ -38,6 +38,9 @@ async function main() {
   fastify.get("/health", async () => ({ status: "ok" }));
 
   await fastify.register(websocketSuiviRoutes);
+  await fastify.register(multipart, {
+    limits: { fileSize: 5 * 1024 * 1024, files: 5 },
+  });
   await fastify.register(depotRoutes);
 
   await initDatabase();

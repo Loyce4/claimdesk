@@ -7,6 +7,7 @@
 
 import { pool } from "../db/pool.js";
 import { notifierClient } from "./notifications.js";
+import { resynchroniserDossier } from "./odoo.js";
 
 export interface DossierEscalade {
   numeroDossier: string;
@@ -64,7 +65,9 @@ export async function escaladerDossiersEnRetard(): Promise<DossierEscalade[]> {
   // Notification du client à chaque escalade (US-F1)
   for (const dossier of escalades) {
     await notifierClient(dossier.numeroDossier, "escalade");
-  }
+    await resynchroniserDossier(dossier.numeroDossier);
+  
+}
 
   return escalades;
   }

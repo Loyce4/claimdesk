@@ -5,7 +5,7 @@ import { pool } from "../db/pool.js";
 import { depotReclamationInSchema, dossierReclamationOutSchema } from "../schemas/reclamation.js";
 import { genererNumeroDossier } from "../services/numerotation.js";
 import { genererCourrier } from "../services/courriers.js";
-import { synchroniserVersOdoo } from "../services/odoo.js";
+import { synchroniserVersOdoo, resynchroniserDossier  } from "../services/odoo.js";
 import { PAYS_CLIENTS, LANGUE_PAR_PAYS } from "../models/dossierReclamation.js";
 import type { PaysClient, TypeReclamation } from "../models/dossierReclamation.js";
 import { appliquerRegle, evaluerRecevabilite } from "../rulesEngine/moteur.js";
@@ -13,6 +13,7 @@ import { envoyerCourrier, listerEnvois } from "../services/envoiCourrier.js";
 import { escaladerDossiersEnRetard } from "../services/escalade.js";
 import { validerReglement } from "../services/reglement.js";
 import { notifierClient } from "../services/notifications.js";
+import { ajouterPieceJointe, listerPiecesJointes, lirePieceJointe } from "../services/piecesJointes.js";
 function mapRowVersDossierOut(row: any) {
   return {
     numeroDossier: row.numero_dossier,
@@ -278,13 +279,89 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
 
       const dossier = resultat.dossier;
 
-     // Notification du règlement au client (US-E2, US-F1)
+    // Notification du règlement au client (US-E2, US-F1)
       await notifierClient(dossier.numeroDossier, "notificationReglement");
+
+      // Reflète le nouveau statut dans Odoo (US-G1)
+      await resynchroniserDossier(dossier.numeroDossier);
 
       fastify.publierMiseAJourDossier?.(dossier.numeroDossier, dossier);
 
       return reply.send(dossier);
     }
   );
+
+  app.post(
+    "/reclamations/:numeroDossier/pieces",
+    {
+      schema: {
+        tags: ["pièces jointes"],
+        summary: "Joindre une pièce justificative (US-A2)",
+        params: z.object({ numeroDossier: z.string() }),
+        consumes: ["multipart/form-data"],
+      },
+    },
+    async (request, reply) => {
+      const { numeroDossier } = request.params as { numeroDossier: string };
+      const fichier = await request.file();
+
+      if (!fichier) {
+        return reply.status(400).send({ message: "Aucun fichier reçu." });
+      }
+
+      const resultat = await ajouterPieceJointe({
+        numeroDossier,
+        nomFichier: fichier.filename,
+        typeMime: fichier.mimetype,
+        contenu: await fichier.toBuffer(),
+      });
+
+      if (!resultat.ok) {
+        return reply.status(400).send({ message: resultat.erreur });
+      }
+
+      return reply.status(201).send(resultat.piece);
+    }
+  );
+
+  app.get(
+    "/reclamations/:numeroDossier/pieces",
+    {
+      schema: {
+        tags: ["pièces jointes"],
+        summary: "Lister les pièces jointes d'un dossier",
+        params: z.object({ numeroDossier: z.string() }),
+      },
+    },
+    async (request, reply) => {
+      const { numeroDossier } = request.params;
+      return reply.send(await listerPiecesJointes(numeroDossier));
+    }
+  );
+
+  app.get(
+    "/reclamations/:numeroDossier/pieces/:idPiece",
+    {
+      schema: {
+        tags: ["pièces jointes"],
+        summary: "Télécharger une pièce jointe",
+        params: z.object({ numeroDossier: z.string(), idPiece: z.string() }),
+      },
+    },
+    async (request, reply) => {
+      const { numeroDossier, idPiece } = request.params;
+      const resultat = await lirePieceJointe(numeroDossier, idPiece);
+
+      if (!resultat) {
+        return reply.status(404).send({ message: "Pièce jointe introuvable." });
+      }
+
+      return reply
+        .type(resultat.piece.typeMime)
+        .header("Content-Disposition", `inline; filename="${resultat.piece.nomFichier}"`)
+        .send(resultat.contenu);
+    }
+  );
 };
+
 

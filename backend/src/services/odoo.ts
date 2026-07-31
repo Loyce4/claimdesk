@@ -91,8 +91,9 @@ async function authentifier(config: ConfigOdoo): Promise<number> {
   if (data.error || !data.result) {
     throw new Error("Échec d'authentification Odoo — vérifie ODOO_USERNAME / ODOO_API_KEY.");
   }
-  uidCache = data.result;
-  return uidCache;
+ const uid = data.result as number;
+  uidCache = uid;
+  return uid;
 }
 
 /**
@@ -155,7 +156,42 @@ export async function synchroniserVersOdoo(dossier: DossierPourOdoo): Promise<bo
 
     return true;
   } catch (err) {
+    // Invalide la session en cache : la prochaine tentative se réauthentifiera
+    uidCache = null;
     console.error("Synchronisation Odoo échouée:", err);
     return false;
   }
+}
+/**
+ * Resynchronise un dossier vers Odoo à partir de son état courant en base.
+ * À appeler après tout changement de statut (escalade, règlement, etc.)
+ * pour que le back-office juridique reste le reflet fidèle du portail.
+ */
+export async function resynchroniserDossier(numeroDossier: string): Promise<boolean> {
+  const { pool } = await import("../db/pool.js");
+
+  const result = await pool.query(
+    `SELECT numero_dossier, pays, type_reclamation, description, nom_client,
+            email_client, montant_reclame, statut, date_echeance
+       FROM dossiers_reclamation
+      WHERE numero_dossier = $1`,
+    [numeroDossier]
+  );
+
+  if (result.rows.length === 0) return false;
+  const row = result.rows[0];
+
+  return synchroniserVersOdoo({
+    numeroDossier: row.numero_dossier,
+    pays: row.pays,
+    typeReclamation: row.type_reclamation,
+    description: row.description,
+    nomClient: row.nom_client,
+    emailClient: row.email_client,
+    montantReclame: row.montant_reclame !== null ? Number(row.montant_reclame) : null,
+    statut: row.statut,
+    dateEcheance: row.date_echeance
+      ? row.date_echeance.toLocaleDateString("fr-CA")
+      : null,
+  });
 }
