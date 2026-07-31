@@ -14,6 +14,7 @@ import { depotRoutes } from "./routes/depot.js";
 import { websocketSuiviRoutes } from "./websocket/suivi.js";
 import { demarrerPlanificateur } from "./services/planificateur.js";
 import multipart from "@fastify/multipart";
+import cors from "@fastify/cors";
 async function main() {
   const fastify = Fastify({ logger: true });
 
@@ -32,6 +33,9 @@ async function main() {
   await fastify.register(swaggerUi, {
     routePrefix: "/docs",
   });
+  // Ouvert en développement pour permettre les tests depuis une page locale.
+  // À restreindre aux domaines d'OMNIVIA avant mise en production.
+  await fastify.register(cors, { origin: true });
 
   await fastify.register(websocketPlugin);
 

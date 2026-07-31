@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>ClaimDesk — Déposer une réclamation</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 620px; margin: 2.5rem auto; padding: 0 1rem; color: #1a1a1a; }
+    h1 { font-size: 1.4rem; font-weight: 500; }
+    label { display: block; margin-top: 1rem; font-size: .9rem; color: #444; }
+    input, select, textarea { width: 100%; padding: .55rem; margin-top: .25rem; font-size: 1rem; font-family: inherit; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+    textarea { min-height: 90px; resize: vertical; }
+    button { margin-top: 1.5rem; padding: .7rem 1.4rem; font-size: 1rem; background: #1a1a1a; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    button:disabled { background: #999; cursor: wait; }
+    .resultat { margin-top: 1.5rem; padding: 1.2rem; border-radius: 8px; display: none; }
+    .succes { background: #f0f7f0; border: 1px solid #cde3cd; display: block; }
+    .erreur { background: #fdf3f3; border: 1px solid #e8cccc; display: block; }
+    .numero { font-size: 1.3rem; font-weight: 500; font-family: ui-monospace, monospace; }
+    dl { display: grid; grid-template-columns: auto 1fr; gap: .4rem 1rem; margin: 1rem 0 0; font-size: .9rem; }
+    dt { color: #666; }
+    dd { margin: 0; }
+  </style>
+</head>
+<body>
+  <h1>Déposer une réclamation</h1>
+
+  <label>Pays
+    <select id="pays">
+      <option value="FR">France</option>
+      <option value="DE">Allemagne</option>
+      <option value="ES">Espagne</option>
+      <option value="IT">Italie</option>
+      <option value="BE">Belgique</option>
+      <option value="NL">Pays-Bas</option>
+      <option value="PL">Pologne</option>
+    </select>
+  </label>
+
+  <label>Langue souhaitée (optionnel)
+    <select id="langue">
+      <option value="">Déduite du pays</option>
+      <option value="fr">Français</option>
+      <option value="de">Allemand</option>
+      <option value="es">Espagnol</option>
+      <option value="it">Italien</option>
+      <option value="nl">Néerlandais</option>
+      <option value="pl">Polonais</option>
+    </select>
+  </label>
+
+  <label>Type de réclamation
+    <select id="type">
+      <option value="produit_non_conforme">Produit non conforme</option>
+      <option value="non_livraison">Non-livraison</option>
+      <option value="retractation">Droit de rétractation</option>
+      <option value="contenu_numerique_defectueux">Contenu numérique défectueux</option>
+      <option value="litige_facturation">Litige de facturation</option>
+    </select>
+  </label>
+
+  <label>Nom complet
+    <input id="nom" value="Marie Dupont">
+  </label>
+
+  <label>Adresse email
+    <input id="email" type="email" value="marie.dupont@example.com">
+  </label>
+
+  <label>Référence de commande
+    <input id="reference" value="CMD-2026-1234">
+  </label>
+
+  <label>Date d'achat
+    <input id="dateAchat" type="date" value="2026-05-15">
+  </label>
+
+  <label>Montant réclamé (EUR)
+    <input id="montant" type="number" step="0.01" value="120">
+  </label>
+
+  <label>Description de votre réclamation
+    <textarea id="description">Le produit livre ne correspond pas a la description figurant sur le site.</textarea>
+  </label>
+
+  <button id="envoyer">Déposer ma réclamation</button>
+
+  <div class="resultat" id="resultat"></div>
+
+  <script>
+    document.getElementById("envoyer").addEventListener("click", async () => {
+      const bouton = document.getElementById("envoyer");
+      const zone = document.getElementById("resultat");
+      bouton.disabled = true;
+      bouton.textContent = "Envoi en cours...";
+
+      const donnees = {
+        pays: document.getElementById("pays").value,
+        typeReclamation: document.getElementById("type").value,
+        description: document.getElementById("description").value,
+        nomClient: document.getElementById("nom").value,
+        emailClient: document.getElementById("email").value,
+        referenceCommande: document.getElementById("reference").value,
+        dateAchat: document.getElementById("dateAchat").value,
+        montantReclame: Number(document.getElementById("montant").value)
+      };
+
+      const langue = document.getElementById("langue").value;
+      if (langue) donnees.langue = langue;
+
+      try {
+        const reponse = await fetch("http://localhost:8000/reclamations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(donnees)
+        });
+
+        const resultat = await reponse.json();
+
+        if (reponse.ok) {
+          zone.className = "resultat succes";
+          zone.innerHTML =
+            "<p>Votre réclamation a bien été enregistrée.</p>" +
+            "<p class='numero'>" + resultat.numeroDossier + "</p>" +
+            "<p>Conservez cette référence pour suivre votre dossier.</p>" +
+            "<dl>" +
+            "<dt>Recevabilité</dt><dd>" + (resultat.recevable === false ? "Non recevable" : "Recevable") + "</dd>" +
+            (resultat.motifIrrecevabilite ? "<dt>Motif</dt><dd>" + resultat.motifIrrecevabilite + "</dd>" : "") +
+            "<dt>Cadre juridique</dt><dd>" + (resultat.baseJuridique || "à qualifier") + "</dd>" +
+            "<dt>Délai de réponse</dt><dd>" + (resultat.delaiCibleJours ? resultat.delaiCibleJours + " jours (au plus tard le " + resultat.dateEcheance + ")" : "à déterminer") + "</dd>" +
+            "<dt>Langue des courriers</dt><dd>" + resultat.langue + "</dd>" +
+            "</dl>";
+        } else {
+          zone.className = "resultat erreur";
+          zone.innerHTML = "<p>Le dépôt a été refusé :</p><pre>" + (resultat.message || JSON.stringify(resultat)) + "</pre>";
+        }
+      } catch (err) {
+        zone.className = "resultat erreur";
+        zone.textContent = "Impossible de joindre le serveur. Vérifiez qu'il est démarré.";
+      }
+
+      bouton.disabled = false;
+      bouton.textContent = "Déposer ma réclamation";
+    });
+  </script>
+</body>
+</html>
