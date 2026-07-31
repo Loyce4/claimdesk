@@ -12,8 +12,9 @@ import { appliquerRegle, evaluerRecevabilite } from "../rulesEngine/moteur.js";
 import { envoyerCourrier, listerEnvois } from "../services/envoiCourrier.js";
 import { escaladerDossiersEnRetard } from "../services/escalade.js";
 import { validerReglement } from "../services/reglement.js";
-import { notifierClient } from "../services/notifications.js";
 import { ajouterPieceJointe, listerPiecesJointes, lirePieceJointe } from "../services/piecesJointes.js";
+import { notifierClient, genererCourrierDossier } from "../services/notifications.js";
+import type { EvenementDossier } from "../services/notifications.js";
 function mapRowVersDossierOut(row: any) {
   return {
     numeroDossier: row.numero_dossier,
@@ -165,7 +166,7 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
       },
     },
     async (request, reply) => {
-      const { numeroDossier } = request.params;
+    const { numeroDossier } = request.params;
       const result = await pool.query(
         `SELECT * FROM dossiers_reclamation WHERE numero_dossier = $1`,
         [numeroDossier]
@@ -179,6 +180,7 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
     }
   );
 
+
   app.get(
     "/reclamations/:numeroDossier/courrier",
     {
@@ -191,38 +193,18 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
     },
     async (request, reply) => {
       const { numeroDossier } = request.params;
-      const { nomCourrier } = request.query;
+      const { nomCourrier } = request.query as { nomCourrier?: string };
 
-      const result = await pool.query(
-        `SELECT * FROM dossiers_reclamation WHERE numero_dossier = $1`,
-        [numeroDossier]
+      const courrier = await genererCourrierDossier(
+        numeroDossier,
+        (nomCourrier ?? "accuseReception") as EvenementDossier
       );
-      if (result.rows.length === 0) {
+
+      if (!courrier) {
         return reply.status(404).send({ message: "Dossier introuvable." });
       }
 
-      const row = result.rows[0];
-      const texte = genererCourrier(
-        {
-          numeroDossier: row.numero_dossier,
-          nomClient: row.nom_client,
-          dateDepot: row.date_depot instanceof Date
-            ? row.date_depot.toLocaleDateString("fr-CA")
-            : row.date_depot,
-          typeReclamation: row.type_reclamation,
-          baseJuridique: row.base_juridique ?? null,
-          delaiCibleJours: row.delai_cible_jours ?? null,
-          dateEcheance: row.date_echeance instanceof Date
-            ? row.date_echeance.toLocaleDateString("fr-CA")
-            : (row.date_echeance ?? null),
-          recevable: row.recevable ?? null,
-          motifIrrecevabilite: row.motif_irrecevabilite ?? null,
-          montantReclame: row.montant_reclame !== null ? Number(row.montant_reclame) : null,
-        },
-        row.langue,
-        nomCourrier
-      );
-      return reply.type("text/plain; charset=utf-8").send(texte);
+      return reply.type("text/plain; charset=utf-8").send(courrier.texte);
     }
   );
 
