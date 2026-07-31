@@ -28,6 +28,7 @@ export interface DonneesCourrier {
   recevable?: boolean | null;
   motifIrrecevabilite?: string | null;
   montantReclame?: number | null;
+  organeEscalade?: string | null;
 }
 
 export function genererCourrier(

@@ -6,6 +6,7 @@
  */
 
 import { pool } from "../db/pool.js";
+import { notifierClient } from "./notifications.js";
 
 export interface DossierEscalade {
   numeroDossier: string;
@@ -51,7 +52,7 @@ export async function escaladerDossiersEnRetard(): Promise<DossierEscalade[]> {
     ]
   );
 
-  return result.rows.map((row) => ({
+ const escalades = result.rows.map((row) => ({
     numeroDossier: row.numero_dossier,
     pays: row.pays,
     organeEscalade: row.organe_escalade ?? null,
@@ -59,4 +60,11 @@ export async function escaladerDossiersEnRetard(): Promise<DossierEscalade[]> {
       ? row.date_echeance.toLocaleDateString("fr-CA")
       : null,
   }));
-}
+
+  // Notification du client à chaque escalade (US-F1)
+  for (const dossier of escalades) {
+    await notifierClient(dossier.numeroDossier, "escalade");
+  }
+
+  return escalades;
+  }

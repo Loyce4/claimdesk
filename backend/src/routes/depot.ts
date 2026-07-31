@@ -12,6 +12,7 @@ import { appliquerRegle, evaluerRecevabilite } from "../rulesEngine/moteur.js";
 import { envoyerCourrier, listerEnvois } from "../services/envoiCourrier.js";
 import { escaladerDossiersEnRetard } from "../services/escalade.js";
 import { validerReglement } from "../services/reglement.js";
+import { notifierClient } from "../services/notifications.js";
 function mapRowVersDossierOut(row: any) {
   return {
     numeroDossier: row.numero_dossier,
@@ -120,35 +121,10 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
       );
 
       const dossier = mapRowVersDossierOut(insertResult.rows[0]);
-      // Accusé de réception envoyé automatiquement au dépôt (US-A3, US-C3).
+     
+      // Accusé de réception envoyé automatiquement au dépôt (US-A3, US-F1).
       // En tâche de fond : un échec d'envoi ne doit jamais bloquer le dépôt.
-      (async () => {
-        const row = insertResult.rows[0];
-        const texte = genererCourrier(
-          {
-            numeroDossier: dossier.numeroDossier,
-            nomClient: dossier.nomClient,
-            dateDepot: dossier.dateDepot,
-            typeReclamation: dossier.typeReclamation,
-            baseJuridique: dossier.baseJuridique,
-            delaiCibleJours: dossier.delaiCibleJours,
-            dateEcheance: dossier.dateEcheance,
-            recevable: row.recevable ?? null,
-            motifIrrecevabilite: row.motif_irrecevabilite ?? null,
-            montantReclame: dossier.montantReclame,
-          },
-          dossier.langue,
-          "accuseReception"
-        );
-
-        await envoyerCourrier({
-          numeroDossier: dossier.numeroDossier,
-          typeCourrier: "accuseReception",
-          destinataire: payload.emailClient,
-          langue: dossier.langue,
-          contenu: texte,
-        });
-      })().catch((err) =>
+      notifierClient(dossier.numeroDossier, "accuseReception").catch((err) =>
         fastify.log.error(err, "Échec de l'envoi de l'accusé de réception")
       );
 
@@ -302,26 +278,8 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
 
       const dossier = resultat.dossier;
 
-      // Notification du règlement au client (US-E2)
-      const texte = genererCourrier(
-        {
-          numeroDossier: dossier.numeroDossier,
-          nomClient: dossier.nomClient,
-          dateDepot: "",
-          montantReclame: dossier.montantIndemniteEur,
-          delaiCibleJours: dossier.delaiTraitementJours,
-        },
-        dossier.langue,
-        "notificationReglement"
-      );
-
-      await envoyerCourrier({
-        numeroDossier: dossier.numeroDossier,
-        typeCourrier: "notificationReglement",
-        destinataire: dossier.emailClient,
-        langue: dossier.langue,
-        contenu: texte,
-      });
+     // Notification du règlement au client (US-E2, US-F1)
+      await notifierClient(dossier.numeroDossier, "notificationReglement");
 
       fastify.publierMiseAJourDossier?.(dossier.numeroDossier, dossier);
 

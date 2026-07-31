@@ -5,7 +5,7 @@
 
 import type { FastifyInstance } from "fastify";
 import { escaladerDossiersEnRetard } from "./escalade.js";
-
+import { notifierClient } from "./notifications.js";
 const INTERVALLE_MS = 60 * 60 * 1000; // toutes les heures
 
 export function demarrerPlanificateur(fastify: FastifyInstance): void {
@@ -23,6 +23,7 @@ export function demarrerPlanificateur(fastify: FastifyInstance): void {
             statut: "escalade",
             organeEscalade: dossier.organeEscalade,
           });
+          await notifierClient(dossier.numeroDossier, "escalade");
         }
       }
     } catch (err) {
