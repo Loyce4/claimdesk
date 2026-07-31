@@ -1,0 +1,27 @@
+{{! MSG-02 Accusé de réception — livrable F2, équipe Marketing digital (SecuriTrade), juillet 2026. }}
+Objet : Potwierdzenie odbioru Państwa reklamacji {{numeroDossier}}
+
+Szanowny/a {{nomClient}},
+
+Potwierdzamy prawidłowe otrzymanie Państwa reklamacji złożonej w dniu {{dateDepot}}.
+
+Państwa sprawa nosi numer referencyjny {{numeroDossier}}. Prosimy go zachować: umożliwia on śledzenie postępów w rozpatrywaniu Państwa wniosku w dowolnym momencie.
+
+{{#if recevable}}
+Państwa wniosek jest obsługiwany przez nasz dział prawny.
+{{#if delaiCibleJours}}
+Zobowiązujemy się udzielić Państwu odpowiedzi w ciągu {{delaiCibleJours}} dni{{#if dateEcheance}}, czyli najpóźniej do {{dateEcheance}}{{/if}}.
+{{/if}}
+{{#if baseJuridique}}
+Ramy prawne mające zastosowanie do Państwa wniosku : {{baseJuridique}}.
+{{/if}}
+{{else if motifIrrecevabilite}}
+Po wstępnym rozpatrzeniu, Państwa wniosek nie może zostać przyjęty z następującego powodu :
+{{motifIrrecevabilite}}
+
+Jeśli uważają Państwo, że ta ocena jest błędna, mogą Państwo przesłać nam wszelkie dodatkowe dokumenty, podając numer referencyjny swojej sprawy.
+{{/if}}
+
+Z poważaniem,
+Dział reklamacji
+OMNIVIA

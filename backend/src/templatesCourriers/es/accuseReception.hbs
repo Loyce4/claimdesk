@@ -1,0 +1,27 @@
+{{! MSG-02 Accusé de réception — livrable F2, équipe Marketing digital (SecuriTrade), juillet 2026. }}
+Objet : Acuse de recibo de su reclamación {{numeroDossier}}
+
+Estimado/a {{nomClient}},
+
+Le confirmamos la correcta recepción de su reclamación presentada el {{dateDepot}}.
+
+Su expediente lleva la referencia {{numeroDossier}}. Consérvela: le permite seguir el avance de su solicitud en cualquier momento.
+
+{{#if recevable}}
+Su solicitud está siendo gestionada por nuestro servicio jurídico.
+{{#if delaiCibleJours}}
+Nos comprometemos a darle una respuesta en un plazo de {{delaiCibleJours}} días{{#if dateEcheance}}, es decir, a más tardar el {{dateEcheance}}{{/if}}.
+{{/if}}
+{{#if baseJuridique}}
+Marco jurídico aplicable a su solicitud : {{baseJuridique}}.
+{{/if}}
+{{else if motifIrrecevabilite}}
+Tras un examen previo, su solicitud no puede ser atendida por el siguiente motivo :
+{{motifIrrecevabilite}}
+
+Si considera que este análisis es incorrecto, puede enviarnos cualquier elemento adicional indicando la referencia de su expediente.
+{{/if}}
+
+Atentamente,
+El servicio de reclamaciones
+OMNIVIA

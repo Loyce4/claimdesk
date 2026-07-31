@@ -1,0 +1,27 @@
+{{! MSG-02 Accusé de réception — livrable F2, équipe Marketing digital (SecuriTrade), juillet 2026. }}
+Objet : Ricevuta di ritorno del suo reclamo {{numeroDossier}}
+
+Gentile {{nomClient}},
+
+Confermiamo la corretta ricezione del suo reclamo presentato il {{dateDepot}}.
+
+Il suo fascicolo porta il riferimento {{numeroDossier}}. Lo conservi: le consente di seguire l'avanzamento della sua richiesta in qualsiasi momento.
+
+{{#if recevable}}
+La sua richiesta è presa in carico dal nostro servizio legale.
+{{#if delaiCibleJours}}
+Ci impegniamo a fornirle una risposta entro {{delaiCibleJours}} giorni{{#if dateEcheance}}, ovvero entro e non oltre il {{dateEcheance}}{{/if}}.
+{{/if}}
+{{#if baseJuridique}}
+Quadro giuridico applicabile alla sua richiesta : {{baseJuridique}}.
+{{/if}}
+{{else if motifIrrecevabilite}}
+Dopo un esame preliminare, la sua richiesta non può essere presa in carico per il seguente motivo :
+{{motifIrrecevabilite}}
+
+Se ritiene che questa analisi sia errata, può trasmetterci qualsiasi elemento aggiuntivo indicando il riferimento del suo fascicolo.
+{{/if}}
+
+Cordiali saluti,
+Il servizio reclami
+OMNIVIA
