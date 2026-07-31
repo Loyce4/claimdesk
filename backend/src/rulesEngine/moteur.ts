@@ -17,12 +17,12 @@ const REGLES_PATH = path.join(__dirname, "reglesJuridiques.json");
 export interface RegleJuridique {
   typeReclamation: string;
   pays: string;
-  baseJuridique?: string;
+  baseJuridique?: LibelleMultilingue;
   conditionRecevabilite?: string;
-  remedePossible?: string;
+  remedePossible?: LibelleMultilingue;
   delaiCibleJours?: number;
   delaiPrescriptionJours?: number;
-  organeEscalade?: string;
+  organeEscalade?: LibelleMultilingue;
   source?: string;
   dateVerification?: string;
 }
@@ -42,7 +42,23 @@ export function trouverRegle(
   return (
     regles.find((r) => r.typeReclamation === typeReclamation && r.pays === pays) ??
     regles.find((r) => r.typeReclamation === typeReclamation && r.pays === "*")
-  );
+  ); 
+}
+/** Un libellé juridique : soit une chaîne unique, soit une version par langue. */
+export type LibelleMultilingue = string | Record<string, string>;
+
+/**
+ * Résout un libellé dans la langue demandée.
+ * Repli sur le français si la traduction n'est pas encore fournie par
+ * l'équipe Droit international.
+ */
+export function resoudreLibelle(
+  libelle: LibelleMultilingue | undefined,
+  langue: string
+): string | null {
+  if (libelle === undefined) return null;
+  if (typeof libelle === "string") return libelle;
+  return libelle[langue.toLowerCase()] ?? libelle.fr ?? null;
 }
 /** Prescriptions par pays, lues depuis le JSON juridique (garantie légale de conformité). */
 function chargerPrescriptions(): Record<string, number> {
@@ -96,17 +112,21 @@ export function appliquerRegle(dossier: {
   typeReclamation: TypeReclamation;
   pays: string;
   dateDepot: Date;
+  langue?: string;
 }): {
   baseJuridique: string | null;
+  remedePropose: string | null;
   organeEscalade: string | null;
   delaiCibleJours: number | null;
   dateEcheance: Date | null;
 } {
   const regle = trouverRegle(dossier.typeReclamation, dossier.pays);
+  const langue = dossier.langue ?? "fr";
 
   if (!regle) {
     return {
       baseJuridique: null,
+      remedePropose: null,
       organeEscalade: null,
       delaiCibleJours: null,
       dateEcheance: null,
@@ -120,8 +140,9 @@ export function appliquerRegle(dossier: {
   }
 
   return {
-    baseJuridique: regle.baseJuridique ?? null,
-    organeEscalade: regle.organeEscalade ?? null,
+    baseJuridique: resoudreLibelle(regle.baseJuridique, langue),
+    remedePropose: resoudreLibelle(regle.remedePossible, langue),
+    organeEscalade: resoudreLibelle(regle.organeEscalade, langue),
     delaiCibleJours: regle.delaiCibleJours ?? null,
     dateEcheance,
   };

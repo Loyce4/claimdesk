@@ -15,6 +15,18 @@
   "regles": [
     {
       "typeReclamation": "produit_non_conforme",
+      "pays": "FR",
+      "_note": "Exemple de règle nationale — références à valider par l'équipe Droit international",
+      "baseJuridique": {
+        "fr": "Code de la consommation, art. L217-3 et suivants (transposition de la directive (UE) 2019/771)"
+      },
+      "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
+      "delaiCibleJours": 14,
+      "organeEscalade": "Service juridique / Responsabilité produit",
+      "dateVerification": "à valider"
+    },
+    {
+      "typeReclamation": "produit_non_conforme",
       "pays": "*",
       "baseJuridique": "Directive (UE) 2019/771 & codes nationaux",
       "conditionRecevabilite": "Défaut de conformité invoqué dans le délai de garantie légale du pays",

@@ -79,6 +79,7 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
         typeReclamation: payload.typeReclamation as TypeReclamation,
         pays: paysMaj,
         dateDepot,
+        langue,
       });
       const recevabilite = evaluerRecevabilite({
   pays: paysMaj,
