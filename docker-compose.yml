@@ -10,18 +10,29 @@ services:
       - claimdesk_db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U claimdesk"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   backend:
     build: ./backend
     restart: unless-stopped
     env_file: .env
+    environment:
+      # Dans le réseau Docker, la base est joignable par le nom du service,
+      # pas par localhost. Surcharge la valeur du .env prévue pour le dev local.
+      DATABASE_URL: postgres://claimdesk:claimdesk@db:5432/claimdesk
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "8000:8000"
     volumes:
       - ./backend/src:/app/src
       - ./backend/tests:/app/tests
+      - ./backend/uploads:/app/uploads
 
   # frontend:
   #   build: ./frontend
