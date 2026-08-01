@@ -9,6 +9,20 @@ on:
 jobs:
   test-and-analyse:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: claimdesk
+          POSTGRES_PASSWORD: claimdesk
+          POSTGRES_DB: claimdesk
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     defaults:
       run:
         working-directory: backend
@@ -28,6 +42,8 @@ jobs:
 
       - name: Lancer les tests avec couverture
         run: npm run test:coverage
+        env:
+          DATABASE_URL: postgres://claimdesk:claimdesk@localhost:5432/claimdesk
 
       - name: Analyse SonarCloud
         uses: SonarSource/sonarqube-scan-action@v5
