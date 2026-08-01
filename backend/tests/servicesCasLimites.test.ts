@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { pool, initDatabase } from "../src/db/pool.js";
+import { pool } from "../src/db/pool.js";
 import { validerReglement } from "../src/services/reglement.js";
 import { notifierClient } from "../src/services/notifications.js";
 import {
@@ -15,10 +15,6 @@ import {
  * Nécessite une base PostgreSQL accessible.
  */
 describe("cas limites des services", () => {
-  beforeAll(async () => {
-    await initDatabase();
-  });
-
   afterAll(async () => {
     await pool.end();
   });

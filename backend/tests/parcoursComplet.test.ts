@@ -7,7 +7,7 @@ import {
   validatorCompiler,
 } from "fastify-type-provider-zod";
 
-import { pool, initDatabase } from "../src/db/pool.js";
+import { pool } from "../src/db/pool.js";
 import { depotRoutes } from "../src/routes/depot.js";
 import { websocketSuiviRoutes } from "../src/websocket/suivi.js";
 import { escaladerDossiersEnRetard } from "../src/services/escalade.js";
@@ -30,7 +30,6 @@ describe("parcours complet d'une réclamation", () => {
     await app.register(multipart, { limits: { fileSize: 5 * 1024 * 1024 } });
     await app.register(websocketSuiviRoutes);
     await app.register(depotRoutes);
-    await initDatabase();
     await app.ready();
   });
 
