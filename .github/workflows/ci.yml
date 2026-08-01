@@ -43,7 +43,7 @@ jobs:
       - name: Lancer les tests avec couverture
         run: npm run test:coverage
         env:
-          DATABASE_URL: postgres://claimdesk:claimdesk@localhost:5432/claimdesk
+          DATABASE_URL: postgres://claimdesk:claimdesk@127.0.0.1:5432/claimdesk
 
       - name: Analyse SonarCloud
         uses: SonarSource/sonarqube-scan-action@v5
