@@ -1,8 +1,7 @@
 # ClaimDesk
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Loyce4_claimdesk&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Loyce4_claimdesk)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Loyce4_claimdesk&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Loyce4_claimdesk)
-
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=Loyce4_claimdesk&metric=alert_status&token=554eb98177968763097b5d7527b47815bcf9d619)](https://sonarcloud.io/summary/new_code?id=Loyce4_claimdesk)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Loyce4_claimdesk&metric=coverage&token=554eb98177968763097b5d7527b47815bcf9d619)](https://sonarcloud.io/summary/new_code?id=Loyce4_claimdesk)
 Module de gestion des réclamations client pour **OMNIVIA**, développé sous conduite technique de **RINTIO**.
 
 ClaimDesk permet à un client de déposer une réclamation, la fait qualifier automatiquement selon le droit applicable à son pays, génère les courriers dans sa langue, permet un suivi en temps réel, escalade automatiquement les dossiers en retard, et enregistre le règlement.
