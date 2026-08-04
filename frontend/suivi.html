@@ -1,78 +1,211 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <title>ClaimDesk — Suivi de dossier</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 640px; margin: 3rem auto; padding: 0 1rem; color: #1a1a1a; }
-    h1 { font-size: 1.4rem; font-weight: 500; }
-    .barre { display: flex; gap: .5rem; margin-bottom: 1.5rem; }
-    input, button { padding: .6rem .8rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 6px; }
-    button { background: #1a1a1a; color: white; border: none; cursor: pointer; }
-    .statut { font-size: 2rem; font-weight: 500; padding: 1.5rem; border: 1px solid #e0e0e0; border-radius: 8px; text-align: center; transition: background .4s; }
-    .flash { background: #fff6d9; }
-    .meta { color: #666; font-size: .9rem; margin-top: .5rem; }
-    ul { list-style: none; padding: 0; font-family: ui-monospace, monospace; font-size: .85rem; }
-    li { padding: .4rem 0; border-bottom: 1px solid #eee; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClaimDesk — Suivi de dossier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #0b3d91;
+    --brand-ink: #082e6e;
+    --brand-100: #e8eefc;
+    --ink: #0f172a;
+    --ink-soft: #5b6472;
+    --surface: #ffffff;
+    --surface-alt: #f6f8fc;
+    --line: #e2e6ed;
+    --radius: 1rem;
+    --shadow: 0 1px 2px rgba(15,23,42,.04), 0 10px 28px -14px rgba(15,23,42,.16);
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--surface-alt);
+    color: var(--ink);
+    margin: 0;
+    padding: 3rem 1.25rem 5rem;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 640px; margin: 0 auto; }
+
+  .entete { margin-bottom: 1.8rem; }
+  .marque {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--brand); margin: 0 0 .6rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .marque::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--brand); display: inline-block; }
+  h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.55rem; font-weight: 700; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  .sous-titre { font-size: .9rem; color: var(--ink-soft); margin: 0; line-height: 1.5; }
+
+  .barre {
+    display: flex; gap: .6rem; background: var(--surface); padding: .6rem;
+    border-radius: 999px; box-shadow: var(--shadow); margin-bottom: 1.4rem;
+  }
+  .barre input {
+    flex: 1; border: none; background: transparent; padding: .55rem .9rem;
+    font-family: 'JetBrains Mono', monospace; font-size: .92rem; color: var(--ink);
+  }
+  .barre input:focus { outline: none; }
+  .barre input::placeholder { font-family: 'Inter', sans-serif; color: #9aa2af; }
+  .barre button {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: .88rem;
+    background: var(--brand); color: #fff; border: none; padding: .6rem 1.3rem;
+    border-radius: 999px; cursor: pointer; transition: background .15s ease, transform .15s ease;
+  }
+  .barre button:hover { background: var(--brand-ink); transform: translateY(-1px); }
+  .barre button:active { transform: translateY(0); }
+
+  .carte-statut {
+    background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 2rem 1.5rem; text-align: center; position: relative; overflow: hidden;
+  }
+  .pastille {
+    display: inline-flex; align-items: center; gap: .4rem; font-size: .74rem; font-weight: 600;
+    color: var(--ink-soft); background: var(--surface-alt); padding: .3rem .7rem; border-radius: 999px;
+    margin-bottom: 1.1rem;
+  }
+  .pastille .point { width: .45rem; height: .45rem; border-radius: 50%; background: #c7cdd6; transition: background .2s ease; }
+  .pastille.en-ligne .point { background: #22a35a; box-shadow: 0 0 0 3px rgba(34,163,90,.18); }
+
+  .statut {
+    font-family: 'Space Grotesk', sans-serif; font-size: 1.9rem; font-weight: 700;
+    color: var(--brand); text-transform: capitalize; letter-spacing: -.01em;
+    transition: opacity .2s ease;
+  }
+  .statut.flash { animation: pulse .7s ease; }
+  @keyframes pulse {
+    0% { opacity: 1; }
+    40% { opacity: .35; }
+    100% { opacity: 1; }
+  }
+  .meta { color: var(--ink-soft); font-size: .84rem; margin-top: .6rem; }
+
+  .journal-entete {
+    font-family: 'Space Grotesk', sans-serif; font-size: .95rem; font-weight: 600;
+    margin: 2rem 0 .8rem; color: var(--ink);
+  }
+  .journal { list-style: none; padding: 0; margin: 0; }
+  .journal li {
+    background: var(--surface); border-radius: .7rem; box-shadow: var(--shadow);
+    padding: .8rem 1rem; margin-bottom: .55rem; font-size: .82rem;
+    animation: entree .3s ease;
+  }
+  @keyframes entree { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .journal li .heure {
+    font-family: 'JetBrains Mono', monospace; font-size: .74rem; color: var(--brand);
+    font-weight: 600; margin-right: .6rem;
+  }
+  .journal li .contenu { color: var(--ink-soft); word-break: break-word; }
+  .journal-vide {
+    text-align: center; color: #9aa2af; font-size: .85rem; padding: 1.6rem 1rem;
+    background: var(--surface); border-radius: .7rem; box-shadow: var(--shadow);
+  }
+
+  .pied { margin-top: 2.2rem; font-size: .78rem; color: #9aa2af; text-align: center; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
 </head>
 <body>
-  <h1>Suivi de dossier en temps réel</h1>
+<div class="page">
+
+  <div class="entete">
+    <p class="marque">OMNIVIA · Service client</p>
+    <h1>Suivi de dossier en temps réel</h1>
+    <p class="sous-titre">Saisissez votre numéro de dossier pour suivre son avancement, sans avoir à rafraîchir la page.</p>
+  </div>
 
   <div class="barre">
-    <input id="numero" value="DE-2026-000004" style="flex:1">
+    <input id="numero" placeholder="ex. FR-2026-000123" autocomplete="off">
     <button id="connecter">Suivre</button>
   </div>
 
-  <div class="statut" id="statut">—</div>
-  <p class="meta" id="meta">Non connecté</p>
+  <div class="carte-statut">
+    <span class="pastille" id="pastille"><span class="point"></span><span id="texteMeta">Non connecté</span></span>
+    <div class="statut" id="statut">—</div>
+  </div>
 
-  <h2 style="font-size:1rem;font-weight:500;margin-top:2rem">Événements reçus</h2>
-  <ul id="journal"></ul>
+  <h2 class="journal-entete">Événements reçus</h2>
+  <ul class="journal" id="journal"></ul>
+  <p class="journal-vide" id="journalVide">Aucun événement pour l'instant. Connectez-vous à un dossier pour commencer le suivi.</p>
 
-  <script>
-    let ws = null;
+  <p class="pied">Les mises à jour sont poussées automatiquement dès qu'un changement survient sur votre dossier.</p>
+</div>
 
-    function journaliser(texte) {
-      const li = document.createElement("li");
-      li.textContent = new Date().toLocaleTimeString() + " — " + texte;
-      document.getElementById("journal").prepend(li);
-    }
+<script>
+  let ws = null;
 
-    function afficherStatut(statut) {
-      const el = document.getElementById("statut");
-      el.textContent = statut;
-      el.classList.add("flash");
-      setTimeout(() => el.classList.remove("flash"), 800);
-    }
+  const elJournal = document.getElementById("journal");
+  const elJournalVide = document.getElementById("journalVide");
+  const elPastille = document.getElementById("pastille");
+  const elTexteMeta = document.getElementById("texteMeta");
+  const elStatut = document.getElementById("statut");
 
-    document.getElementById("connecter").addEventListener("click", () => {
-      const numero = document.getElementById("numero").value.trim();
-      if (ws) ws.close();
+  function journaliser(texte) {
+    elJournalVide.style.display = "none";
+    const li = document.createElement("li");
+    const heure = document.createElement("span");
+    heure.className = "heure";
+    heure.textContent = new Date().toLocaleTimeString();
+    const contenu = document.createElement("span");
+    contenu.className = "contenu";
+    contenu.textContent = texte;
+    li.appendChild(heure);
+    li.appendChild(contenu);
+    elJournal.prepend(li);
+  }
 
-      ws = new WebSocket("ws://localhost:8000/ws/reclamations/" + numero);
+  function afficherStatut(statut) {
+    elStatut.textContent = statut;
+    elStatut.classList.remove("flash");
+    void elStatut.offsetWidth;
+    elStatut.classList.add("flash");
+  }
 
-      ws.onopen = () => {
-        document.getElementById("meta").textContent = "Connecté au dossier " + numero;
-      };
+  document.getElementById("connecter").addEventListener("click", () => {
+    const numero = document.getElementById("numero").value.trim();
+    if (!numero) return;
+    if (ws) ws.close();
 
-      ws.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        if (message.type === "connecte") {
-          journaliser("Abonnement confirmé");
-        } else if (message.type === "misAJour") {
-          const donnees = message.donnees ?? {};
-          if (donnees.statut) afficherStatut(donnees.statut);
-          journaliser("Mise à jour : " + JSON.stringify(donnees));
-        }
-      };
+    elPastille.classList.remove("en-ligne");
+    elTexteMeta.textContent = "Connexion en cours…";
 
-      ws.onclose = () => {
-        document.getElementById("meta").textContent = "Déconnecté";
-      };
+    ws = new WebSocket("ws://localhost:8000/ws/reclamations/" + numero);
 
-      ws.onerror = () => journaliser("Erreur de connexion");
-    });
-  </script>
+    ws.onopen = () => {
+      elPastille.classList.add("en-ligne");
+      elTexteMeta.textContent = "Connecté au dossier " + numero;
+    };
+
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "connecte") {
+        journaliser("Abonnement confirmé");
+      } else if (message.type === "misAJour") {
+        const donnees = message.donnees ?? {};
+        if (donnees.statut) afficherStatut(donnees.statut);
+        journaliser("Le dossier est passé à l'état « " + (donnees.statut ?? "inconnu") + " »");
+      }
+    };
+
+    ws.onclose = () => {
+      elPastille.classList.remove("en-ligne");
+      elTexteMeta.textContent = "Déconnecté";
+    };
+
+    ws.onerror = () => journaliser("Erreur de connexion");
+  });
+
+  document.getElementById("numero").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("connecter").click();
+  });
+</script>
 </body>
 </html>
