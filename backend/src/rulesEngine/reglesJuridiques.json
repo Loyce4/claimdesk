@@ -2,7 +2,7 @@
   "_lisezMoi": "Fichier rempli par l'équipe Droit international (Félicité). Le moteur de règles lit ce fichier — aucune règle ne doit être codée en dur dans le code TypeScript. Le pays '*' signifie : applicable à tous les pays du périmètre. Une règle avec un pays précis (ex. 'IT') prend le dessus sur la règle '*'.",
   "source": "Matrice de qualification juridique — Félicité, équipe Droit international",
   "dateVerification": "2026-08-05",
-  "decisions": "Fourchettes de délais : maximum retenu. Prescription : garantie légale de conformité. NL : plancher 24 mois + examen manuel. IT : 26 mois. (Validé Félicité 25/07). Citations nationales pour produit_non_conforme (DE, ES, IT, BE, NL, PL) ajoutées le 05/08 et validées par Félicité le 05/08.",
+  "decisions": "Fourchettes de délais : maximum retenu. Prescription : garantie légale de conformité. NL : plancher 24 mois + examen manuel. IT : 26 mois. (Validé Félicité 25/07). Citations nationales pour produit_non_conforme (DE, ES, IT, BE, NL, PL) ajoutées le 05/08 et validées par Félicité le 05/08. Organes d'escalade nationaux ajoutés le 05/08, à valider par Félicité.",
   "prescriptionMoisParPays": {
     "FR": 24,
     "DE": 24,
@@ -22,7 +22,7 @@
       },
       "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
       "delaiCibleJours": 14,
-      "organeEscalade": "Service juridique / Responsabilité produit",
+      "organeEscalade": "Médiateur de la consommation agréé désigné par OMNIVIA (cf. liste CECMC)",
       "dateVerification": "à valider"
     },
     {
@@ -33,7 +33,7 @@
       },
       "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
       "delaiCibleJours": 14,
-      "organeEscalade": "Service juridique / Responsabilité produit",
+      "organeEscalade": "Universalschlichtungsstelle des Bundes",
       "dateVerification": "2026-08-05"
     },
     {
@@ -44,7 +44,7 @@
       },
       "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
       "delaiCibleJours": 14,
-      "organeEscalade": "Service juridique / Responsabilité produit",
+      "organeEscalade": "Junta Arbitral Nacional de Consumo",
       "dateVerification": "2026-08-05"
     },
     {
@@ -55,7 +55,7 @@
       },
       "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
       "delaiCibleJours": 14,
-      "organeEscalade": "Service juridique / Responsabilité produit",
+      "organeEscalade": "Camera di Commercio competente (piattaforma ConciliaCamera)",
       "dateVerification": "2026-08-05"
     },
     {
@@ -67,7 +67,7 @@
       },
       "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
       "delaiCibleJours": 14,
-      "organeEscalade": "Service juridique / Responsabilité produit",
+      "organeEscalade": "Service de Médiation pour le Consommateur",
       "dateVerification": "2026-08-05"
     },
     {
@@ -78,7 +78,7 @@
       },
       "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
       "delaiCibleJours": 14,
-      "organeEscalade": "Service juridique / Responsabilité produit",
+      "organeEscalade": "Geschillencommissie Thuiswinkel",
       "dateVerification": "2026-08-05"
     },
     {
@@ -89,7 +89,7 @@
       },
       "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
       "delaiCibleJours": 14,
-      "organeEscalade": "Service juridique / Responsabilité produit",
+      "organeEscalade": "Inspekcja Handlowa — Wojewódzki Inspektorat (sous supervision UOKiK)",
       "dateVerification": "2026-08-05"
     },
     {
