@@ -2,7 +2,7 @@
   "_lisezMoi": "Fichier rempli par l'équipe Droit international (Félicité). Le moteur de règles lit ce fichier — aucune règle ne doit être codée en dur dans le code TypeScript. Le pays '*' signifie : applicable à tous les pays du périmètre. Une règle avec un pays précis (ex. 'IT') prend le dessus sur la règle '*'.",
   "source": "Matrice de qualification juridique — Félicité, équipe Droit international",
   "dateVerification": "2026-08-05",
-  "decisions": "Fourchettes de délais : maximum retenu. Prescription : garantie légale de conformité. NL : plancher 24 mois + examen manuel. IT : 26 mois. (Validé Félicité 25/07). Citations nationales pour produit_non_conforme (DE, ES, IT, BE, NL, PL) ajoutées le 05/08 et validées par Félicité le 05/08. Organes d'escalade nationaux ajoutés le 05/08, à valider par Félicité.",
+  "decisions": "Fourchettes de délais : maximum retenu. Prescription : garantie légale de conformité. NL : plancher 24 mois + examen manuel. IT : 26 mois. (Validé Félicité 25/07). Citations nationales et organes d'escalade pour produit_non_conforme (7 pays) ajoutés le 05/08 et validés par Félicité le 05/08.",
   "prescriptionMoisParPays": {
     "FR": 24,
     "DE": 24,
@@ -16,14 +16,13 @@
     {
       "typeReclamation": "produit_non_conforme",
       "pays": "FR",
-      "_note": "Exemple de règle nationale — références à valider par l'équipe Droit international",
       "baseJuridique": {
         "fr": "Code de la consommation, art. L217-3 et suivants (transposition de la directive (UE) 2019/771)"
       },
       "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
       "delaiCibleJours": 14,
       "organeEscalade": "Médiateur de la consommation agréé désigné par OMNIVIA (cf. liste CECMC)",
-      "dateVerification": "à valider"
+      "dateVerification": "2026-08-05"
     },
     {
       "typeReclamation": "produit_non_conforme",
