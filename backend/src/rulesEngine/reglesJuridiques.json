@@ -1,8 +1,8 @@
 {
   "_lisezMoi": "Fichier rempli par l'équipe Droit international (Félicité). Le moteur de règles lit ce fichier — aucune règle ne doit être codée en dur dans le code TypeScript. Le pays '*' signifie : applicable à tous les pays du périmètre. Une règle avec un pays précis (ex. 'IT') prend le dessus sur la règle '*'.",
   "source": "Matrice de qualification juridique — Félicité, équipe Droit international",
-  "dateVerification": "2026-07-25",
-  "decisions": "Fourchettes de délais : maximum retenu. Prescription : garantie légale de conformité. NL : plancher 24 mois + examen manuel. IT : 26 mois. (Validé Félicité 25/07)",
+  "dateVerification": "2026-08-05",
+  "decisions": "Fourchettes de délais : maximum retenu. Prescription : garantie légale de conformité. NL : plancher 24 mois + examen manuel. IT : 26 mois. (Validé Félicité 25/07). Citations nationales pour produit_non_conforme ajoutées le 05/08, à valider par Félicité.",
   "prescriptionMoisParPays": {
     "FR": 24,
     "DE": 24,
@@ -19,6 +19,78 @@
       "_note": "Exemple de règle nationale — références à valider par l'équipe Droit international",
       "baseJuridique": {
         "fr": "Code de la consommation, art. L217-3 et suivants (transposition de la directive (UE) 2019/771)"
+      },
+      "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
+      "delaiCibleJours": 14,
+      "organeEscalade": "Service juridique / Responsabilité produit",
+      "dateVerification": "à valider"
+    },
+    {
+      "typeReclamation": "produit_non_conforme",
+      "pays": "DE",
+      "_note": "Citation à confirmer par Félicité — recherche préliminaire",
+      "baseJuridique": {
+        "de": "Bürgerliches Gesetzbuch (BGB), § 434 ff. (Umsetzung der Richtlinie (EU) 2019/771)"
+      },
+      "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
+      "delaiCibleJours": 14,
+      "organeEscalade": "Service juridique / Responsabilité produit",
+      "dateVerification": "à valider"
+    },
+    {
+      "typeReclamation": "produit_non_conforme",
+      "pays": "ES",
+      "_note": "Citation à confirmer par Félicité — recherche préliminaire",
+      "baseJuridique": {
+        "es": "Real Decreto Legislativo 1/2007 (TRLGDCU), art. 114 y siguientes (transposición de la Directiva (UE) 2019/771)"
+      },
+      "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
+      "delaiCibleJours": 14,
+      "organeEscalade": "Service juridique / Responsabilité produit",
+      "dateVerification": "à valider"
+    },
+    {
+      "typeReclamation": "produit_non_conforme",
+      "pays": "IT",
+      "_note": "Citation à confirmer par Félicité — recherche préliminaire",
+      "baseJuridique": {
+        "it": "Codice del Consumo (D.Lgs. 206/2005), artt. 128 e seguenti (recepimento della direttiva (UE) 2019/771)"
+      },
+      "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
+      "delaiCibleJours": 14,
+      "organeEscalade": "Service juridique / Responsabilité produit",
+      "dateVerification": "à valider"
+    },
+    {
+      "typeReclamation": "produit_non_conforme",
+      "pays": "BE",
+      "_note": "Citation à confirmer par Félicité — recherche préliminaire. Langue fr retenue par défaut (cf. LANGUE_PAR_PAYS, à valider en équipe)",
+      "baseJuridique": {
+        "fr": "Ancien Code civil, art. 1649bis et suivants (transposition de la directive (UE) 2019/771)"
+      },
+      "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
+      "delaiCibleJours": 14,
+      "organeEscalade": "Service juridique / Responsabilité produit",
+      "dateVerification": "à valider"
+    },
+    {
+      "typeReclamation": "produit_non_conforme",
+      "pays": "NL",
+      "_note": "Citation à confirmer par Félicité — recherche préliminaire",
+      "baseJuridique": {
+        "nl": "Burgerlijk Wetboek, Boek 7, art. 7:17 e.v. (omzetting van Richtlijn (EU) 2019/771)"
+      },
+      "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
+      "delaiCibleJours": 14,
+      "organeEscalade": "Service juridique / Responsabilité produit",
+      "dateVerification": "à valider"
+    },
+    {
+      "typeReclamation": "produit_non_conforme",
+      "pays": "PL",
+      "_note": "Citation à confirmer par Félicité — recherche préliminaire",
+      "baseJuridique": {
+        "pl": "Ustawa z dnia 30 maja 2014 r. o prawach konsumenta, art. 43a i nast. (transpozycja dyrektywy (UE) 2019/771)"
       },
       "remedePossible": "Mise en conformité gratuite (réparation ou remplacement), à défaut réduction du prix ou résolution du contrat",
       "delaiCibleJours": 14,
