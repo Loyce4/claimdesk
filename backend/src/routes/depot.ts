@@ -15,6 +15,7 @@ import { validerReglement } from "../services/reglement.js";
 import { ajouterPieceJointe, listerPiecesJointes, lirePieceJointe } from "../services/piecesJointes.js";
 import { notifierClient, genererCourrierDossier } from "../services/notifications.js";
 import type { EvenementDossier } from "../services/notifications.js";
+import { ajusterQualification } from "../services/qualification.js";
 function mapRowVersDossierOut(row: any) {
   return {
     numeroDossier: row.numero_dossier,
@@ -270,6 +271,59 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
       fastify.publierMiseAJourDossier?.(dossier.numeroDossier, dossier);
 
       return reply.send(dossier);
+    }
+  );
+
+  app.patch(
+    "/reclamations/:numeroDossier/qualification",
+    {
+      schema: {
+        tags: ["qualification"],
+        summary: "Ajuster la qualification juridique (US-B4)",
+        params: z.object({ numeroDossier: z.string() }),
+        body: z.object({
+          baseJuridique: z.string().min(1).optional(),
+          delaiCibleJours: z.number().int().min(0).optional(),
+          auteur: z.string().min(1),
+          justification: z.string().min(5),
+        }),
+        response: {
+          200: z.object({
+            numeroDossier: z.string(),
+            statut: z.string(),
+            baseJuridique: z.string().nullable(),
+            delaiCibleJours: z.number().nullable(),
+            dateEcheance: z.string().nullable(),
+          }),
+          400: z.object({ message: z.string() }),
+        },
+      },
+    },
+    async (request, reply) => {
+      const { numeroDossier } = request.params;
+      const { baseJuridique, delaiCibleJours, auteur, justification } = request.body;
+
+      if (baseJuridique === undefined && delaiCibleJours === undefined) {
+        return reply.status(400).send({
+          message: "Aucun changement fourni (baseJuridique ou delaiCibleJours requis).",
+        });
+      }
+
+      const resultat = await ajusterQualification({
+        numeroDossier,
+        baseJuridique,
+        delaiCibleJours,
+        auteur,
+        justification,
+      });
+
+      if (!resultat.ok || !resultat.dossier) {
+        return reply.status(400).send({ message: resultat.erreur ?? "Ajustement impossible." });
+      }
+
+      fastify.publierMiseAJourDossier?.(resultat.dossier.numeroDossier, resultat.dossier);
+
+      return reply.send(resultat.dossier);
     }
   );
 
