@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ClaimDesk — Suivi de dossier</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230b3d91'/><text x='16' y='22' font-family='system-ui,sans-serif' font-size='18' font-weight='700' fill='white' text-anchor='middle'>C</text></svg>">
 <style>
   :root {
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: ui-monospace, 'Cascadia Code', 'Segoe UI Mono', Consolas, 'Liberation Mono', monospace;
     --brand: #0b3d91;
     --brand-ink: #082e6e;
     --brand-100: #e8eefc;
@@ -22,7 +22,7 @@
   }
   * { box-sizing: border-box; }
   body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-sans);
     background: var(--surface-alt);
     color: var(--ink);
     margin: 0;
@@ -33,13 +33,13 @@
 
   .entete { margin-bottom: 1.8rem; }
   .marque {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: var(--font-sans);
     font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
     color: var(--brand); margin: 0 0 .6rem;
     display: flex; align-items: center; gap: .5rem;
   }
   .marque::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--brand); display: inline-block; }
-  h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.55rem; font-weight: 700; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  h1 { font-family: var(--font-sans); font-size: 1.55rem; font-weight: 700; margin: 0 0 .4rem; letter-spacing: -.01em; }
   .sous-titre { font-size: .9rem; color: var(--ink-soft); margin: 0; line-height: 1.5; }
 
   .barre {
@@ -48,12 +48,12 @@
   }
   .barre input {
     flex: 1; border: none; background: transparent; padding: .55rem .9rem;
-    font-family: 'JetBrains Mono', monospace; font-size: .92rem; color: var(--ink);
+    font-family: var(--font-mono); font-size: .92rem; color: var(--ink);
   }
   .barre input:focus { outline: none; }
-  .barre input::placeholder { font-family: 'Inter', sans-serif; color: #9aa2af; }
+  .barre input::placeholder { font-family: var(--font-sans); color: #9aa2af; }
   .barre button {
-    font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: .88rem;
+    font-family: var(--font-sans); font-weight: 600; font-size: .88rem;
     background: var(--brand); color: #fff; border: none; padding: .6rem 1.3rem;
     border-radius: 999px; cursor: pointer; transition: background .15s ease, transform .15s ease;
   }
@@ -73,7 +73,7 @@
   .pastille.en-ligne .point { background: #22a35a; box-shadow: 0 0 0 3px rgba(34,163,90,.18); }
 
   .statut {
-    font-family: 'Space Grotesk', sans-serif; font-size: 1.9rem; font-weight: 700;
+    font-family: var(--font-sans); font-size: 1.9rem; font-weight: 700;
     color: var(--brand); text-transform: capitalize; letter-spacing: -.01em;
     transition: opacity .2s ease;
   }
@@ -86,7 +86,7 @@
   .meta { color: var(--ink-soft); font-size: .84rem; margin-top: .6rem; }
 
   .journal-entete {
-    font-family: 'Space Grotesk', sans-serif; font-size: .95rem; font-weight: 600;
+    font-family: var(--font-sans); font-size: .95rem; font-weight: 600;
     margin: 2rem 0 .8rem; color: var(--ink);
   }
   .journal { list-style: none; padding: 0; margin: 0; }
@@ -97,7 +97,7 @@
   }
   @keyframes entree { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
   .journal li .heure {
-    font-family: 'JetBrains Mono', monospace; font-size: .74rem; color: var(--brand);
+    font-family: var(--font-mono); font-size: .74rem; color: var(--brand);
     font-weight: 600; margin-right: .6rem;
   }
   .journal li .contenu { color: var(--ink-soft); word-break: break-word; }
@@ -147,6 +147,7 @@
   const elPastille = document.getElementById("pastille");
   const elTexteMeta = document.getElementById("texteMeta");
   const elStatut = document.getElementById("statut");
+  const elNumero = document.getElementById("numero");
 
   function journaliser(texte) {
     elJournalVide.style.display = "none";
@@ -169,8 +170,7 @@
     elStatut.classList.add("flash");
   }
 
-  document.getElementById("connecter").addEventListener("click", () => {
-    const numero = document.getElementById("numero").value.trim();
+  function connecterAuDossier(numero) {
     if (!numero) return;
     if (ws) ws.close();
 
@@ -201,11 +201,24 @@
     };
 
     ws.onerror = () => journaliser("Erreur de connexion");
+  }
+
+  document.getElementById("connecter").addEventListener("click", () => {
+    connecterAuDossier(elNumero.value.trim());
   });
 
-  document.getElementById("numero").addEventListener("keydown", (e) => {
+  elNumero.addEventListener("keydown", (e) => {
     if (e.key === "Enter") document.getElementById("connecter").click();
   });
+
+  // --- Pré-remplissage + connexion automatique depuis l'URL (ex. suivi.html?dossier=FR-2026-000004) ---
+  const parametresUrl = new URLSearchParams(window.location.search);
+  const numeroDepuisUrl = parametresUrl.get("dossier");
+  if (numeroDepuisUrl) {
+    elNumero.value = numeroDepuisUrl;
+    connecterAuDossier(numeroDepuisUrl);
+  }
+  // --- fin pré-remplissage ---
 </script>
 </body>
 </html>

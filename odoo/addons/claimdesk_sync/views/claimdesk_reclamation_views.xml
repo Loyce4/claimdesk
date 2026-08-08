@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_claimdesk_reclamation_tree" model="ir.ui.view">
+        <field name="name">claimdesk.reclamation.tree</field>
+        <field name="model">claimdesk.reclamation</field>
+        <field name="arch" type="xml">
+            <tree string="Réclamations ClaimDesk">
+                <field name="numero_dossier"/>
+                <field name="pays"/>
+                <field name="type_reclamation"/>
+                <field name="nom_client"/>
+                <field name="statut"/>
+                <field name="date_echeance"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_claimdesk_reclamation_form" model="ir.ui.view">
+        <field name="name">claimdesk.reclamation.form</field>
+        <field name="model">claimdesk.reclamation</field>
+        <field name="arch" type="xml">
+            <form string="Réclamation ClaimDesk">
+                <sheet>
+                    <group>
+                        <field name="numero_dossier"/>
+                        <field name="pays"/>
+                        <field name="type_reclamation"/>
+                        <field name="statut"/>
+                        <field name="date_echeance"/>
+                    </group>
+                    <group>
+                        <field name="nom_client"/>
+                        <field name="email_client"/>
+                        <field name="montant_reclame"/>
+                    </group>
+                    <group>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_claimdesk_reclamation" model="ir.actions.act_window">
+        <field name="name">Réclamations ClaimDesk</field>
+        <field name="res_model">claimdesk.reclamation</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_claimdesk_root" name="ClaimDesk"/>
+    <menuitem id="menu_claimdesk_reclamations" name="Réclamations" parent="menu_claimdesk_root" action="action_claimdesk_reclamation"/>
+
+</odoo>

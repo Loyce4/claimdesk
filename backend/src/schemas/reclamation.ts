@@ -30,6 +30,7 @@ export const dossierReclamationOutSchema = z.object({
   description: z.string(),
   nomClient: z.string(),
   emailClient: z.string(),
+  referenceCommande: z.string(),
   montantReclame: z.number().nullable(),
   statut: z.enum(STATUTS_DOSSIER),
   dateDepot: z.string(),

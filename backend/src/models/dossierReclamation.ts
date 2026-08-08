@@ -16,6 +16,7 @@ export const TYPES_RECLAMATION = [
   "retractation",
   "contenu_numerique_defectueux",
   "litige_facturation",
+  "autre",
 ] as const;
 export type TypeReclamation = (typeof TYPES_RECLAMATION)[number];
 

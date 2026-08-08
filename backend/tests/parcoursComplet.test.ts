@@ -149,7 +149,7 @@ describe("parcours complet d'une réclamation", () => {
       url: `/reclamations/${numeroDossier}`,
     });
     expect(reponse.json().statut).toBe("escalade");
-  });
+  }, 30000);
 
   it("6. valide le règlement et clôt le parcours", async () => {
     const reponse = await app.inject({

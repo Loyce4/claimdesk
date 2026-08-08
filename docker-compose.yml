@@ -34,6 +34,23 @@ services:
       - ./backend/tests:/app/tests
       - ./backend/uploads:/app/uploads
 
+  odoo:
+    image: odoo:17
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      HOST: db
+      PORT: "5432"
+      USER: claimdesk
+      PASSWORD: claimdesk
+    ports:
+      - "8069:8069"
+    volumes:
+      - claimdesk_odoo_data:/var/lib/odoo
+      - ./odoo/addons:/mnt/extra-addons
+      - ./odoo/odoo.conf:/etc/odoo/odoo.conf
   # frontend:
   #   build: ./frontend
   #   restart: unless-stopped
@@ -46,3 +63,4 @@ services:
 
 volumes:
   claimdesk_db_data:
+  claimdesk_odoo_data:

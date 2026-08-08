@@ -25,6 +25,7 @@ function mapRowVersDossierOut(row: any) {
     description: row.description,
     nomClient: row.nom_client,
     emailClient: row.email_client,
+    referenceCommande: row.reference_commande,
     montantReclame: row.montant_reclame !== null ? Number(row.montant_reclame) : null,
     statut: row.statut,
     dateDepot: row.date_depot instanceof Date
@@ -233,7 +234,20 @@ const langue = payload.langue?.toLowerCase() ?? LANGUE_PAR_PAYS[paysMaj as PaysC
       },
     },
     async (_request, reply) => {
-      return reply.send({ escalades: await escaladerDossiersEnRetard() });
+      const escalades = await escaladerDossiersEnRetard();
+
+      // Notifie en direct les clients WebSocket abonnés aux dossiers escaladés
+      for (const dossier of escalades) {
+        const result = await pool.query(
+          `SELECT * FROM dossiers_reclamation WHERE numero_dossier = $1`,
+          [dossier.numeroDossier]
+        );
+        if (result.rows.length > 0) {
+          fastify.publierMiseAJourDossier?.(dossier.numeroDossier, mapRowVersDossierOut(result.rows[0]));
+        }
+      }
+
+      return reply.send({ escalades });
     }
   );
 
